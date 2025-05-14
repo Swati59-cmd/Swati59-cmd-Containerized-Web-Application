@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Set working directory
-WORDIR /app
+WORKDIR /app
 
 # Copy requirements first for better caching
 COPY requirements.txt .
@@ -15,7 +15,7 @@ COPY . .
 
 # Create templates directory and move the template file
 RUN mkdir -p templates
-COPY index.html templates/
+COPY templates/index.html templates/
 
 # Set environment variables
 ENV PORT=5000
