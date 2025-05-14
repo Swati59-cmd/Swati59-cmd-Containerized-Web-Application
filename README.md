@@ -39,10 +39,9 @@ This repository contains a simple Flask web application that needs to be contain
    - AWS_ACCESS_KEY_ID
    - AWS_SECRET_ACCESS_KEY
 
-5. Fix any issues in the Dockerfile and test it locally:
+5. Build the docker image and test it locally:
    ```
-   docker build -t devops-intern-app:local .
-   docker run -p 5000:5000 devops-intern-app:local
+Using docker build && docker run command.
    ```
 
 6. Initialize and apply Terraform configuration:
