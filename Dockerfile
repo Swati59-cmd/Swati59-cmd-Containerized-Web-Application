@@ -15,7 +15,7 @@ COPY . .
 
 # Create templates directory and move the template file
 RUN mkdir -p templates
-COPY templates/index.html templates/
+COPY index.html templates/
 
 # Set environment variables
 ENV PORT=5000
