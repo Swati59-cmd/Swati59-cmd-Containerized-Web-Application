@@ -1,1 +1,71 @@
 
+name: Build and Push to ECR
+
+on:
+  push:
+    branches:
+      - dev
+      - stage
+      - main
+
+env:
+  AWS_ACCOUNT_ID: "648908580279"
+  AWS_REGION: "us-east-1"
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::648908580279:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set Environment Variables
+        id: vars
+        run: |
+          BRANCH="${GITHUB_REF##*/}"
+          if [[ "$BRANCH" == "dev" ]]; then
+            REPO_NAME="devops-intern-dev"
+            CONTAINER_NAME="dev-container"
+          elif [[ "$BRANCH" == "stage" ]]; then
+            REPO_NAME="devops-intern-stage"
+            CONTAINER_NAME="stage-container"
+          else
+            REPO_NAME="devops-intern-prod"
+            CONTAINER_NAME="prod-container"
+          fi
+          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+          IMAGE_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
+
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $IMAGE_URI .
+
+      - name: Push Docker Image to ECR
+        run: |
+          docker push $IMAGE_URI
+
+      - name: Write imagedefinitions.json
+        run: |
+          echo '[{"name":"'"$CONTAINER_NAME"'","imageUri":"'"$IMAGE_URI"'"}]' > imagedefinitions.json
+          cat imagedefinitions.json
+
+      - name: Upload Artifact for Deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: imagedefinitions
+          path: imagedefinitions.json
