@@ -65,7 +65,8 @@ jobs:
           cat imagedefinitions.json
 
       - name: Upload Artifact for Deployment
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        
         with:
           name: imagedefinitions
           path: imagedefinitions.json
