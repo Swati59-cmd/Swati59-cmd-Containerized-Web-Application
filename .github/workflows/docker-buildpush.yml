@@ -37,7 +37,7 @@ jobs:
             CONTAINER_NAME="stage-container"
           else
             REPO_NAME="mainpython"
-            CONTAINER_NAME="prod-container"
+            CONTAINER_NAME="main-container"
           fi
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
           IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
