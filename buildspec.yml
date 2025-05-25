@@ -1,0 +1,49 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_ACCOUNT_ID: "648908580279"
+    AWS_DEFAULT_REGION: "us-east-1"
+
+phases:
+  pre_build:
+    commands:
+      - echo "Checking Docker..."
+      - DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id docker-hub-credentials --query SecretString --output text | jq -r '.docker_username')
+      - DOCKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id docker-hub-credentials --query SecretString --output text | jq -r '.docker_password')
+      - docker info
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+      # Set environment-based repo and container name
+      - echo Detecting environment...
+      - |
+        if [[ "$CODEBUILD_SOURCE_VERSION" == "refs/heads/dev" ]]; then
+          REPOSITORY_NAME="devops-intern-dev"
+          CONTAINER_NAME="dev-container"
+        elif [[ "$CODEBUILD_SOURCE_VERSION" == "refs/heads/stage" ]]; then
+          REPOSITORY_NAME="devops-intern-stage"
+          CONTAINER_NAME="stage-container"
+        else
+          REPOSITORY_NAME="devops-intern-prod"
+          CONTAINER_NAME="prod-container"
+        fi
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPOSITORY_NAME
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - echo "Building the Docker image..."
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+
+  post_build:
+    commands:
+      - echo "Pushing the image into ECR..."
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Writing imagedefinitions.json file..."
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
