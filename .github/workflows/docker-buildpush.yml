@@ -22,10 +22,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::648908580279:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
+           role-to-assume: arn:aws:iam::648908580279:role/GitHubActionsRole
+           aws-region: us-east-1
 
-      - name: Log in to Amazon ECR
+         - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Set Environment Variables
