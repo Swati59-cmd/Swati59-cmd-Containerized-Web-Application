@@ -30,13 +30,13 @@ jobs:
         run: |
           BRANCH="${GITHUB_REF##*/}"
           if [[ "$BRANCH" == "dev" ]]; then
-            REPO_NAME="devops-intern-dev"
+            REPO_NAME="devpython"
             CONTAINER_NAME="dev-container"
           elif [[ "$BRANCH" == "stage" ]]; then
-            REPO_NAME="devops-intern-stage"
+            REPO_NAME="stagepython"
             CONTAINER_NAME="stage-container"
           else
-            REPO_NAME="devops-intern-prod"
+            REPO_NAME="mainpython"
             CONTAINER_NAME="prod-container"
           fi
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
