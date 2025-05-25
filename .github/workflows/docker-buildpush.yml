@@ -7,9 +7,7 @@ on:
       - stage
       - main
 
-env:
-  AWS_ACCOUNT_ID: "648908580279"
-  AWS_REGION: "us-east-1"
+
 
 jobs:
   docker:
