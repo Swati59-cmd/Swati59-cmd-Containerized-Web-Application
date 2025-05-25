@@ -26,8 +26,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Set Environment Variables
-        id: vars
-        run: |
+        
           BRANCH="${GITHUB_REF##*/}"
           if [[ "$BRANCH" == "dev" ]]; then
             REPO_NAME="devpython"
