@@ -11,9 +11,6 @@ jobs:
   docker:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: us-east-1
-      AWS_ACCOUNT_ID: 648908580279
 
     steps:
       - name: Checkout Code
