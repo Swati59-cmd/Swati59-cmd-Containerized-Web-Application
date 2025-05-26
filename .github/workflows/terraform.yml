@@ -1,4 +1,4 @@
-name: Terraform Deployment -main
+name: Terraform Deployment -stage
 on:
   push:
     branches: [main]
