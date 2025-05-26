@@ -1,7 +1,7 @@
 name: Terraform Deployment -stage
 on:
   push:
-    branches: [main]
+    branches: [stage]
 jobs:
   deploy:
     runs-on: ubuntu-latest
