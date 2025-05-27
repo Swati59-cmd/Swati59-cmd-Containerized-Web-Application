@@ -8,9 +8,8 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws --version
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 648908580279.dkr.ecr.us-east-1.amazonaws.com
-      - export ECR_IMAGE=648908580279.dkr.ecr.us-east-1.amazonaws.com/mainpython
+      - export REPOSITORY_URI=648908580279.dkr.ecr.us-east-1.amazonaws.com/mainpython
       - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
