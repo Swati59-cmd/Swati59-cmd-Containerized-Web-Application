@@ -7,10 +7,10 @@ env:
 phases:
   pre_build:
     commands:
-      
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 648908580279.dkr.ecr.us-east-1.amazonaws.com
-      - export IMAGE_URI=648908580279.dkr.ecr.us-east-1.amazonaws.com/stagepython
+      - aws --version
+      - $(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 648908580279.dkr.ecr.us-east-1.amazonaws.com)
+      - export REPOSITORY_URI=648908580279.dkr.ecr.us-east-1.amazonaws.com/stagepython
       - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
