@@ -1,13 +1,17 @@
 version: 0.2
+env:
+  variables:
+    AWS_ACCOUNT_ID: "648908580279"
+    AWS_DEFAULT_REGION: "us-east-1"
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - aws --version
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 648908580279.dkr.ecr.us-east-1.amazonaws.com
       - export REPOSITORY_URI=648908580279.dkr.ecr.us-east-1.amazonaws.com/mainpython
       - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo Tagging as $REPOSITORY_URI:$IMAGE_TAG
 
   build:
     commands:
@@ -16,10 +20,10 @@ phases:
 
   post_build:
     commands:
-      - echo Pushing the image to ECR...
+      - echo Pushing the Image into ECR...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions...
-      - printf '[{"name":"mainpython","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo Writing image definitions file...
+      - printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
