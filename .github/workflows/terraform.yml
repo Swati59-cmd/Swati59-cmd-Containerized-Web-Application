@@ -29,11 +29,16 @@ jobs:
         working-directory: terraformcode
 
       - name: Plan Terraform
-        run: terraform plan -out=tfplan
+        run: terraform plan 
         working-directory: terraformcode
 
       - name: Apply Terraform
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply 
+        working-directory: terraformcode
+
+        
+      - name: Destroy Terraform
+        run: terraform destroy 
         working-directory: terraformcode
 
         
