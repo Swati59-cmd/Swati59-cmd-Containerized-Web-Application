@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2        # clone to the repo
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -25,22 +25,20 @@ jobs:
           aws-region: us-east-1 
 
       - name: Initialize Terraform
-        run: terraform init 
+        run: terraform init
         working-directory: terraformcode
 
       - name: Plan Terraform
-        run: terraform plan 
+        run: terraform plan -out=tfplan
         working-directory: terraformcode
 
       - name: Apply Terraform
         run: terraform apply -auto-approve tfplan
         working-directory: terraformcode
 
-        
       - name: Destroy Terraform
         run: terraform destroy -auto-approve
         working-directory: terraformcode
-
         
 
        
