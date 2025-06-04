@@ -36,9 +36,9 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: ECSModule
 
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: ECSModule
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve
+        working-directory: ECSModule
         
 
        
