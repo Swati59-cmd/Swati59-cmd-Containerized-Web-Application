@@ -1,5 +1,5 @@
 module "ECSdemo" {
-  source = "../../Module/ECS-Dev"
+  source = "../ECS"
 
   environment   = var.environment
   image         = var.image
