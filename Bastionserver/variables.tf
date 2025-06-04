@@ -27,6 +27,6 @@ variable "subnet_ids" {
   default     = ["subnet-0b1455777aa0843bc", "subnet-0224b8b3343395f38"]
 }
 variable "ami" {
-  type    = number
+  type    = string
   default = "ami-02457590d33d576c3"
 }
