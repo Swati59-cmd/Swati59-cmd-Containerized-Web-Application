@@ -1,5 +1,5 @@
 module "cicd" {
-  source         = "../../Module/CICD-Stage"
+  source         = "../CICD"
   env            = "stage"
   bucket_name    = var.bucket_name
   github_branch  = var.github_branch
