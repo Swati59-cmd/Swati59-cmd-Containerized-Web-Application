@@ -33,7 +33,7 @@ jobs:
         working-directory: terraformcode
 
       - name: Apply Terraform
-        run: terraform apply 
+        run: terraform apply -auto-approve tfplan
         working-directory: terraformcode
 
         
