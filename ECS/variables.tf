@@ -30,12 +30,12 @@ variable "image" {
 variable "subnet_ids" {
   description = "List of Public subnet for ALB"
   type        = list(string)
-  default     = ["subnet-0989adfb31834e9c0", "subnet-0ff6fb1a2203b472d"]
+  default     = ["subnet-052312b45c84846d5", "subnet-06830bd1c3c6d96c5"]
 }
 variable "private_subnet_ids" {
   description = "List of Private subnet for EC2"
   type        = list(string)
-  default     = ["subnet-0b9b38966e22694b2", "subnet-039a011cdd64b24aa"]
+  default     = ["subnet-00404b7f5b0b89228", "subnet-00956bf065fff8108"]
 }
 
 variable "vpc_id" {
