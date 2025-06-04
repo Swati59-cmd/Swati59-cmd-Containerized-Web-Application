@@ -4,7 +4,7 @@ variable "env" {
 }
 variable "bucket_name" {
   type = string
-
+  default = "demostageartifact"
 }
 
 variable "github_branch" {
