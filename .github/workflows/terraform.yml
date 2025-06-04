@@ -26,19 +26,19 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
-        working-directory: ECSmodule
+        working-directory: CICDmodule
 
       - name: Plan Terraform
         run: terraform plan -out=tfplan
-        working-directory: ECSmodule
+        working-directory: CICDmodule
 
       - name: Apply Terraform
         run: terraform apply -auto-approve tfplan
-        working-directory: ECSmodule
+        working-directory: CICDmodule
 
       #- name: Destroy Terraform
        # run: terraform destroy -auto-approve
-        #working-directory: ECSmodule
+        #working-directory: CICDmodule
         
 
        
