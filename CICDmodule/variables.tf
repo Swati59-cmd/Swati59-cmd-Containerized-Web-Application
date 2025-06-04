@@ -25,4 +25,3 @@ variable "aws_account_id" {
   type    = number
   default = 648908580279
 }
-
