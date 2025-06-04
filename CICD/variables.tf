@@ -15,8 +15,8 @@ variable "github_branch" {
 variable "ecs_cluster" {
   type = string
   default = "dev-ecs-cluster"
-
 }
+
 variable "ecs_service" {
    type= string
   default = "dev-service"
