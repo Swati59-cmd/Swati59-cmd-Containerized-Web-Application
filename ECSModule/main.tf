@@ -1,5 +1,5 @@
 module "ECSP" {
-  source = "../../Module/ECS-Stage"
+  source = "../ECS"
 
   environment        = var.environment
   image              = var.image
