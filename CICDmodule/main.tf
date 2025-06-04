@@ -1,5 +1,5 @@
 module "cicd" {
-  source         = "../../Module/CICD-Dev"
+  source         = "../CICD"
   env            = "dev"
   bucket_name    = var.bucket_name
   github_branch  = var.github_branch
