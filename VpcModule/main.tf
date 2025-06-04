@@ -1,17 +1,6 @@
-module "ECSP" {
-  source = "../terraformcode"
-
-  environment   = var.environment
-  image         = var.image
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  subnet_ids    = var.subnet_ids
-  vpc_id        = var.vpc_id
-
-
-
+module "vpc" {
+  source               = "../terraformcode"
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
-
-
-
-
