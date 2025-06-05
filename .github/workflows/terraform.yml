@@ -36,9 +36,9 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: CICDModule
 
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: Bastionmodule
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve
+        working-directory: CICDModule
         
 
        
