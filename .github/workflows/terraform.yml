@@ -36,9 +36,10 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: modules/ECS
 
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/ECS
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve
+        working-directory: modules/ECS
+        
       - name: Initialize Terraform
         run: terraform init
         working-directory: modules/VPC
@@ -51,9 +52,9 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: modules/VPC
 
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/VPC
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve
+        working-directory: modules/VPC
         
 
 
