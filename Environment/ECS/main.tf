@@ -55,9 +55,9 @@ EOF
 
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.environment}-ecs-asg"
-  min_size            = 2
-  max_size            = 4
-  desired_capacity    = 2
+  min_size            = 1
+  max_size            = 1
+  desired_capacity    = 1
   vpc_zone_identifier = module.vpc_stage.private_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
