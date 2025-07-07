@@ -1,15 +1,12 @@
-module "ECSP" {
-  source = "../../Module/ECS-Main"
+terraform {
+  backend "s3" {
+    bucket = "statefilevpc"
+    key    = "ECS-main/terraform.tfstate"
+    region = "us-east-1"
 
-  environment   = var.environment
-  image         = var.image
-  instance_type = var.instance_type
-  key_name      = var.key_name
-
-
-
-
+  }
 }
+
 
 
 
