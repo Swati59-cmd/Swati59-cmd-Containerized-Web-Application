@@ -8,9 +8,10 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2        # clone to the repp
+        uses: actions/checkout@v2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -22,26 +23,30 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 
+          aws-region: us-east-1
 
-      - name: Initialize Terraform
+      # VPC first
+      - name: Terraform Init - VPC
         run: terraform init
-        working-directory: ECSModule
+        working-directory: modules/VPC
 
-      - name: Plan Terraform
-        run: terraform plan -out=tfplan
-        working-directory: ECSModule
+      - name: Terraform Apply - VPC
+        run: terraform apply -auto-approve
+        working-directory: modules/VPC
 
-      - name: Apply Terraform
-        run: terraform apply -auto-approve tfplan
-        working-directory: ECSModule
+     # - name: Destroy Terraform
+      #  run: terraform destroy -auto-approve
+       # working-directory: modules/VPC
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: ECSModule
-        
+      # ECS second (after VPC is ready)
+      - name: Terraform Init - ECS
+        run: terraform init
+        working-directory: modules/ECS
 
-       
+      - name: Terraform Apply - ECS
+        run: terraform apply -auto-approve
+        working-directory: modules/ECS
 
-
-        
+      #- name: Destroy Terraform
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/ECS
