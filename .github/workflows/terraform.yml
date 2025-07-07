@@ -26,17 +26,17 @@ jobs:
           aws-region: us-east-1
 
       # VPC first
-      - name: Terraform Init - VPC
-        run: terraform init
-        working-directory: modules/VPC
+      #- name: Terraform Init - VPC
+       # run: terraform init
+        #working-directory: modules/VPC
 
-      - name: Terraform Apply - VPC
-        run: terraform apply -auto-approve
-        working-directory: modules/VPC
+      #- name: Terraform Apply - VPC
+       # run: terraform apply -auto-approve
+        #working-directory: modules/VPC
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: modules/VPC
+      #- name: Destroy Terraform
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/VPC
 
       # ECS second (after VPC is ready)
       - name: Terraform Init - ECS
@@ -47,6 +47,6 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: modules/ECS
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: modules/ECS
+      #- name: Destroy Terraform
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/ECS
