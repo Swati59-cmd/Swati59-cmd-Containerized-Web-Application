@@ -1,4 +1,4 @@
-module "ECSP" {
+module "EcsDemo" {
   source = "../../Environment/ECS"
 
   environment   = var.environment
