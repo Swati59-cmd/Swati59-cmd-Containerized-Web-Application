@@ -43,6 +43,10 @@ jobs:
         run: terraform init
         working-directory: modules/ECS
 
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: modules/ECS
+
       - name: Terraform Apply - ECS
         run: terraform apply -auto-approve
         working-directory: modules/ECS
