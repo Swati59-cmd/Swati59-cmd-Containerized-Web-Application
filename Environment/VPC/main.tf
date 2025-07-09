@@ -1,19 +1,18 @@
-provider "aws" {
-  region = "eu-north-1"
-}
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "ProjectVpc"
+    Name    = "ProjectVpc"
+    Project = "swati-project"
   }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "igw-main"
+    Name    = "igw-main"
+    Project = "swati-project"
   }
 }
 
@@ -21,7 +20,8 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
   tags = {
-    Name = "nat-main"
+    Name    = "nat-main"
+    Project = "swati-project"
   }
 
   depends_on = [aws_internet_gateway.igw]
@@ -38,7 +38,8 @@ resource "aws_subnet" "public" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
   tags = {
-    Name = "public-subnet-${count.index + 1}"
+    Name    = "public-subnet-${count.index + 1}"
+    Project = "swati-project"
   }
 }
 
@@ -49,14 +50,16 @@ resource "aws_subnet" "private" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
   tags = {
-    Name = "private-subnet-${count.index + 1}"
+    Name    = "private-subnet-${count.index + 1}"
+    Project = "swati-project"
   }
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "public-rt"
+    Name    = "public-rt"
+    Project = "swati-project"
   }
 }
 
@@ -75,7 +78,8 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "private-rt"
+    Name    = "private-rt"
+    Project = "swati-project"
   }
 }
 

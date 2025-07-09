@@ -35,6 +35,7 @@ resource "aws_security_group" "ecs_instance_sg" {
   }
 
   tags = {
-    Name = "Projectecs-sg1"
+    Name    = "Projectecs-sg1"
+    Project = "swati-project"
   }
 }

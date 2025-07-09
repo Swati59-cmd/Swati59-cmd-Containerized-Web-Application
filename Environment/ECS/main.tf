@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "main" {
   name = "${var.environment}-ecs-cluster"
+  tags = {
+    Name        = "${var.environment}-listener"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 
 resource "aws_iam_role" "ecs_instance_role" {
@@ -15,6 +20,11 @@ resource "aws_iam_role" "ecs_instance_role" {
       Action = "sts:AssumeRole"
     }]
   })
+  tags = {
+    Name        = "${var.environment}-listener"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
@@ -47,8 +57,15 @@ EOF
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "${var.environment}-ecs-instance"
+      Name        = "${var.environment}-ecs-instance"
+      Environment = var.environment
+      Project     = "swati-project"
     }
+  }
+  tags = {
+    Name        = "${var.environment}-ecs-launch-template"
+    Environment = var.environment
+    Project     = "swati-project"
   }
 }
 
@@ -72,7 +89,19 @@ resource "aws_autoscaling_group" "ecs_asg" {
     value               = "${var.environment}-ecs-instance"
     propagate_at_launch = true
   }
+  tag {
+    key                 = "Environment"
+    value               = var.environment
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Project"
+    value               = "swati-project"
+    propagate_at_launch = true
+  }
 }
+
 
 
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -88,6 +117,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       Action = "sts:AssumeRole"
     }]
   })
+  tags = {
+    Name        = "${var.environment}-ecs-task-execution-role"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
@@ -117,6 +151,11 @@ resource "aws_ecs_task_definition" "task" {
   ])
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  tags = {
+    Name        = "${var.environment}-task-definition"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 
 resource "aws_ecs_service" "service" {
@@ -131,9 +170,12 @@ resource "aws_ecs_service" "service" {
     container_name   = "app"
     container_port   = 5000
   }
-
-
   depends_on = [aws_lb_listener.listener]
+  tags = {
+    Name        = "${var.environment}-ecs-service"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"

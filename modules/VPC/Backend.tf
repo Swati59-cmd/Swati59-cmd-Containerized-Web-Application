@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "swati-tfstate-20250708"
+    bucket = "swatitfstate"
     key    = "vpc/terraform.tfstate"
-    region = "ap-south-1"
+    region = "us-east-1"
 
   }
 }
