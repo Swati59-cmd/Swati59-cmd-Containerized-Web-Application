@@ -47,9 +47,9 @@ jobs:
         working-directory: modules/ECS
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var="image=${{ github.event.inputs.image }}"
+        run: terraform plan -out=tfplan -var="image_uri=${{ github.event.inputs.image_uri }}"
         working-directory: modules/ECS
 
       - name: Terraform Apply - ECS
-        run: terraform apply -auto-approve -var="image=${{ github.event.inputs.image }}"
+        run: terraform apply -auto-approve -var="image_uri=${{ github.event.inputs.image_uri }}"
         working-directory: modules/ECS
