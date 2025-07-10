@@ -1,58 +1,62 @@
-name: Application CI/CD
+name: Deploy App to ECR & Trigger Terraform (Dev)
 
 on:
   push:
-    branches: [dev, stage, main]
+    branches:
+      - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  IMAGE_NAME: devpython
+  ECR_REPOSITORY: devpython
 
 jobs:
-  deploy:
-    name: Build, Push to ECR, Deploy to ECS
+  build-and-push-ecr:
+    name: Build & Push Docker Image to ECR
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: us-east-1
-      ECR_REPOSITORY: devpython
-      ECS_CLUSTER: dev-ecs-cluster
-      ECS_SERVICE: dev-service
-      ECS_TASK_DEFINITION: dev-app
-
     steps:
-      - name: Checkout Code
+      - name: Checkout Source
         uses: actions/checkout@v3
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubApp-role
+          role-session-name: github-actions
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Set IMAGE_TAG and IMAGE_URI
+      - name: Extract Git Short SHA
+        id: gitsha
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image
         run: |
-          IMAGE_TAG=${GITHUB_SHA::7}
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
+          IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${SHORT_SHA}"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
 
-      - name: Build Docker Image
-        run: |
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
-
-      - name: Push image to ECR
-        run: docker push $IMAGE_URI
-
-      - name: Update ECS task definition file
-        run: |
-          sed "s|<IMAGE_URI>|$IMAGE_URI|g" $ECS_TASK_DEFINITION > updated-taskdef.json
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Trigger Terraform CI/CD
+        uses: actions/github-script@v7
         with:
-          task-definition: updated-taskdef.json
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          github-token: ${{ secrets.REPO_DISPATCH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'YOUR_GITHUB_USERNAME',
+              repo: 'terraform-devops-intern',
+              workflow_id: 'terraform.yml',
+              ref: 'dev',
+              inputs: {
+                image_url: process.env.IMAGE_URI,
+                target_branch: 'dev',
+                env_name: 'dev'
+              }
+            })
