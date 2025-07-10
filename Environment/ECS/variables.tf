@@ -25,6 +25,6 @@ variable "key_name" {
 variable "image" {
   description = "Docker image to be used in ECS task"
   type        = string
-  default     = "648908580279.dkr.ecr.us-east-1.amazonaws.com/stagepython"
+  default     = "851725602228.dkr.ecr.us-east-1.amazonaws.com/stagepython"
 }
 
