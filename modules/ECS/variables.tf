@@ -22,7 +22,7 @@ variable "key_name" {
   default     = "lambda"
 }
 
-variable "image" {
+variable "image_uri" {
   description = "Docker image to be used in ECS task"
   type        = string
   default     = "851725602228.dkr.ecr.us-east-1.amazonaws.com/devpython"
