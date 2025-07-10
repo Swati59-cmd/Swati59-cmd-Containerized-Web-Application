@@ -4,10 +4,27 @@ on:
   push:
     branches:
       - dev
+  workflow_dispatch:
+    inputs:
+      image_url:
+        description: 'ECR image URL to deploy'
+        required: true
+        type: string
+      target_branch:
+        description: 'Branch to deploy'
+        required: true
+        type: string
+      env_name:
+        description: 'Deployment environment (e.g., dev, stage, prod)'
+        required: true
+        type: string
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
 
     steps:
       - name: Checkout Repository
@@ -23,34 +40,16 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      # VPC first
-      #- name: Terraform Init - VPC
-       # run: terraform init
-        #working-directory: modules/VPC
-
-      #- name: Terraform Apply - VPC
-       # run: terraform apply -auto-approve
-        #working-directory: modules/VPC
-
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/VPC
-
-      # ECS second (after VPC is ready)
       - name: Terraform Init - ECS
         run: terraform init
         working-directory: modules/ECS
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -var="image_uri=${{ github.event.inputs.image_url }}"
         working-directory: modules/ECS
 
       - name: Terraform Apply - ECS
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="image_uri=${{ github.event.inputs.image_url }}"
         working-directory: modules/ECS
-
-     # - name: Destroy Terraform
-      #  run: terraform destroy -auto-approve
-       # working-directory: modules/ECS
