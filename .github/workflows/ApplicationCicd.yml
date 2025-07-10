@@ -48,7 +48,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: 'Swati59-cmd',
               repo: 'terraform-devops-intern',
-              workflow_id: 'terraform.yml',
+              workflow_id: 'Terraform.yml',
               ref: 'dev',
               inputs: {
                 image_url: process.env.IMAGE_URI,
