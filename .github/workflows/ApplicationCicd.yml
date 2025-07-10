@@ -47,7 +47,7 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'Swati59-cmd',
-              repo: 'terraform-devops-intern',
+              repo: 'Swati59-cmd-Containerized-Web-Application',
               workflow_id: 'Terraform.yml',
               ref: 'dev',
               inputs: {
