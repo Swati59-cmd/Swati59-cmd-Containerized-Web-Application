@@ -43,18 +43,18 @@ jobs:
           docker push $IMAGE_URI
 
       - name: Trigger Terraform CI/CD
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.REPO_DISPATCH_PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'YOUR_GITHUB_USERNAME',
-              repo: 'terraform-devops-intern',
-              workflow_id: 'terraform.yml',
-              ref: 'dev',
-              inputs: {
-                image_url: process.env.IMAGE_URI,
-                target_branch: 'dev',
-                env_name: 'dev'
-              }
-            })
+  uses: actions/github-script@v7
+  with:
+    github-token: ${{ secrets.REPO_DISPATCH_PAT }}
+    script: |
+      await github.rest.actions.createWorkflowDispatch({
+        owner: 'Swati59-cmd',
+        repo: 'terraform-devops-intern',
+        workflow_id: 'terraform.yml',
+        ref: 'dev',
+        inputs: {
+          image_url: process.env.IMAGE_URI,
+          target_branch: 'dev',
+          env_name: 'dev'
+        }
+      })
