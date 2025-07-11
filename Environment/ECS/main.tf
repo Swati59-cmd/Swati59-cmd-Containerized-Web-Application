@@ -162,25 +162,30 @@ resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.task.arn
-  network_configuration {
-    subnets          = module.vpc.public_subnet_ids # Or public_subnet_ids if needed
-    security_groups  = [aws_security_group.ecs_instance_sg.id]
-    assign_public_ip = true # true only if using public subnets
-  }
+  launch_type     = "EC2"
 
+  network_configuration {
+    subnets         = module.vpc.public_subnet_ids
+    security_groups = [aws_security_group.ecs_instance_sg.id]
+    # REMOVE THIS LINE
+    # assign_public_ip = true
+  }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
     container_name   = "app"
     container_port   = 5000
   }
+
   depends_on = [aws_lb_listener.listener]
+
   tags = {
     Name        = "${var.environment}-ecs-service"
     Environment = var.environment
     Project     = "swati-project"
   }
 }
+
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
 }
