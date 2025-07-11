@@ -53,3 +53,7 @@ jobs:
       - name: Terraform Apply - ECS
         run: terraform apply -auto-approve -var="image_uri=${{ github.event.inputs.image_uri }}"
         working-directory: modules/ECS
+
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve -var="image_uri=${{ github.event.inputs.image_uri }}"
+        working-directory: modules/ECS
