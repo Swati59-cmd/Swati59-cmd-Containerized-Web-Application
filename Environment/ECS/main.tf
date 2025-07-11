@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "task" {
   requires_compatibilities = ["EC2"]
   network_mode             = "bridge"
   cpu                      = "256"
-  memory                   = "128"
+  memory                   = "512"
 
   container_definitions = jsonencode([
     {
@@ -151,11 +151,6 @@ resource "aws_ecs_task_definition" "task" {
   ])
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  tags = {
-    Name        = "${var.environment}-task-definition"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
 }
 
 resource "aws_ecs_service" "service" {
@@ -174,10 +169,10 @@ resource "aws_ecs_service" "service" {
 
   depends_on = [aws_lb_listener.listener]
 }
-
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
 }
+
 
 module "vpc" {
   source               = "../VPC"
