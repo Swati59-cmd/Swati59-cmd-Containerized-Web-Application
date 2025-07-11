@@ -42,18 +42,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Set IMAGE_URI from dispatch or fallback default
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "IMAGE_URI=${{ github.event.inputs.image_url }}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_URI=851725602228.dkr.ecr.us-east-1.amazonaws.com/devpython:latest" >> $GITHUB_ENV
+          fi
+
       - name: Terraform Init - ECS
         run: terraform init
         working-directory: modules/ECS
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var="image_uri=${{ github.event.inputs.image_uri }}"
+        run: terraform plan -out=tfplan -var="image_uri=${{ env.IMAGE_URI }}"
         working-directory: modules/ECS
 
       - name: Terraform Apply - ECS
-        run: terraform apply -auto-approve -var="image_uri=${{ github.event.inputs.image_uri }}"
+        run: terraform apply -auto-approve -var="image_uri=${{ env.IMAGE_URI }}"
         working-directory: modules/ECS
-
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve -var="image_uri=${{ github.event.inputs.image_uri }}"
-        #working-directory: modules/ECS
