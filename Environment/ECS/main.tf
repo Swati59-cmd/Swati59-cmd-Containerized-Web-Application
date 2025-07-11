@@ -132,7 +132,7 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.environment}-app"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   cpu                      = "256"
   memory                   = "128"
 
