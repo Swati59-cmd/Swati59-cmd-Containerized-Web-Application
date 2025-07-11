@@ -161,9 +161,13 @@ resource "aws_ecs_task_definition" "task" {
 resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 2
-  launch_type     = "EC2"
+  task_definition = aws_
+  network_configuration {
+    subnets          = module.vpc.private_subnet_ids # Or public_subnet_ids if needed
+    security_groups  = [aws_security_group.ecs_service_sg.id]
+    assign_public_ip = false # true only if using public subnets
+  }
+
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
