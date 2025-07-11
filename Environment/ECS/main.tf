@@ -161,11 +161,11 @@ resource "aws_ecs_task_definition" "task" {
 resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_
+  task_definition = aws_ecs_task_definition.task.arn
   network_configuration {
     subnets          = module.vpc.private_subnet_ids # Or public_subnet_ids if needed
-    security_groups  = [aws_security_group.ecs_service_sg.id]
-    assign_public_ip = false # true only if using public subnets
+    security_groups  = [aws_security_group.ecs_instance_sg.id]
+    assign_public_ip = true # true only if using public subnets
   }
 
 
