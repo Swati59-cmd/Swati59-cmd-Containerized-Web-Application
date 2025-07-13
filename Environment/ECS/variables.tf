@@ -22,12 +22,16 @@ variable "key_name" {
   default     = "lambda"
 }
 
-variable "image_uri" {
-  description = "Docker image to be used in ECS task"
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+}
+
+variable "ecr_repo_url" {
+  description = "ECR repository URI without tag"
   type        = string
   default     = "851725602228.dkr.ecr.us-east-1.amazonaws.com/devpython"
 }
-
 
 
 
