@@ -2,26 +2,16 @@ resource "aws_lb" "alb" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = module.vpc.public_subnet_ids
-  security_groups    = [aws_security_group.ecs_instance_sg.id]
-  tags = {
-    Name        = "${var.environment}-alb"
-    Environment = var.environment
-    Project     = "swati-Project"
-  }
+  subnets            = module.vpc_main.public_subnet_ids
+  security_groups    = [aws_security_group.alb_sg.id]
+
 }
 
 resource "aws_lb_target_group" "tg" {
-  name        = "${var.environment}-tg"
-  port        = 5000
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = module.vpc.vpc_id
-  tags = {
-    Name        = "${var.environment}-tg"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
+  name     = "${var.environment}-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_main.vpc_id
 
 }
 
@@ -33,11 +23,4 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg.arn
   }
-  tags = {
-    Name        = "${var.environment}-listener"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
-
 }
-
