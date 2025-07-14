@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "task" {
   requires_compatibilities = ["EC2"]
   network_mode             = "bridge"
   cpu                      = "256"
-  memory                   = "512"
+  memory                   = "256"
 
   container_definitions = jsonencode([
     {
