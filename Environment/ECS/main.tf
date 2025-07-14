@@ -72,8 +72,8 @@ EOF
 
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.environment}-ecs-asg"
-  min_size            = 2
-  max_size            = 4
+  min_size            = 1
+  max_size            = 3
   desired_capacity    = 2
   vpc_zone_identifier = module.vpc.public_subnet_ids
   health_check_type   = "EC2"
@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "task" {
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   cpu                      = "256"
-  memory                   = "256"
+  memory                   = "512"
 
   container_definitions = jsonencode([
     {
