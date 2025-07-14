@@ -167,6 +167,12 @@ resource "aws_ecs_service" "service" {
   desired_count   = 2
   launch_type     = "EC2"
 
+  network_configuration {
+    subnets          = module.vpc.public_subnet_ids            # or private_subnet_ids
+    security_groups  = [aws_security_group.ecs_instance_sg.id] # define this SG
+    assign_public_ip = true                                    # only if using public subnets
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
     container_name   = "app"
