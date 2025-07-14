@@ -1,21 +1,19 @@
-name: App CI/CD
+name: Terraform Infrastructure CI/CD
 
 on:
   push:
     branches: [main, dev, stage]
     paths:
-      - 'app.py'
-      - 'Dockerfile'
-      - '.github/workflows/ApplicationCicd.yml'
+      - 'Environment/**'
+      - 'modules/**'
+      - '.github/workflows/TerraformCicd.yml'
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
-      ECR_REPO_NAME: devpython
       TF_DIR: ./Environment/ECS
-      IMAGE_TAG: ${{ github.sha }}
 
     steps:
     - name: Checkout code
@@ -28,16 +26,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to ECR
-      uses: aws-actions/amazon-ecr-login@v2
-
-    - name: Build and Push Docker Image
-      run: |
-        REPO_URI=$(aws ecr describe-repositories --repository-names $ECR_REPO_NAME --query 'repositories[0].repositoryUri' --output text --region $AWS_REGION)
-        docker build -t $REPO_URI:$IMAGE_TAG .
-        docker push $REPO_URI:$IMAGE_TAG
-        echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
-
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -47,10 +35,14 @@ jobs:
       run: terraform init
       working-directory: ${{ env.TF_DIR }}
 
-    - name: Terraform Plan (App Update)
-      run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -out=tfplan
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
       working-directory: ${{ env.TF_DIR }}
 
-    - name: Terraform Apply (App Update)
+    - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
+      working-directory: ${{ env.TF_DIR }}
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
       working-directory: ${{ env.TF_DIR }}
