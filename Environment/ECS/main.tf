@@ -147,8 +147,15 @@ resource "aws_ecs_task_definition" "task" {
           hostPort      = 80
         }
       ]
+      environment = [
+        {
+          name  = "FORCE_DEPLOY"
+          value = "${timestamp()}"
+        }
+      ]
     }
   ])
+
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 }
