@@ -4,6 +4,10 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   subnets            = module.vpc.public_subnet_ids
   security_groups    = [aws_security_group.ecs_instance_sg.id]
+  tags = {
+    Name        = "${var.environment}-alb"
+    Projectname = "swati project"
+  }
 
 }
 
@@ -13,6 +17,10 @@ resource "aws_lb_target_group" "tg" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = module.vpc.vpc_id
+  tags = {
+    Name        = "${var.environment}"
+    Projectname = "swati project"
+  }
 
 }
 
@@ -23,5 +31,9 @@ resource "aws_lb_listener" "listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg.arn
+  }
+  tags = {
+    Name        = "${var.environment}"
+    Projectname = "swati project"
   }
 }
