@@ -1,4 +1,10 @@
 version: 0.2
+on:
+  push:
+    branches:
+      - dev
+      - main
+      - stage
 env:
   variables:
     AWS_ACCOUNT_ID: "851725602228"
