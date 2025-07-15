@@ -72,8 +72,8 @@ EOF
 
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.environment}-ecs-asg"
-  min_size            = 1
-  max_size            = 3
+  min_size            = 2
+  max_size            = 4
   desired_capacity    = 2
   vpc_zone_identifier = module.vpc.public_subnet_ids
   health_check_type   = "EC2"
@@ -132,28 +132,23 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.environment}-app"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   cpu                      = "256"
   memory                   = "512"
 
   container_definitions = jsonencode([
     {
       name      = "app"
-      image     = "${var.ecr_repo_url}:${var.image_tag}"
+      image     = var.image
       essential = true
       portMappings = [
         {
           containerPort = 5000,
-          hostPort      = 5000
-          protocol      = "tcp"
+          hostPort      = 80
+
         }
       ]
-      environment = [
-        {
-          name  = "FORCE_DEPLOY"
-          value = "${timestamp()}"
-        }
-      ]
+
     }
   ])
 
@@ -168,11 +163,7 @@ resource "aws_ecs_service" "service" {
   desired_count   = 2
   launch_type     = "EC2"
 
-  network_configuration {
-    subnets          = module.vpc.public_subnet_ids            # or private_subnet_ids
-    security_groups  = [aws_security_group.ecs_instance_sg.id] # define this SG
-    assign_public_ip = false                                   # only if using public subnets
-  }
+
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
