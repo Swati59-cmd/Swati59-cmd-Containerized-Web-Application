@@ -29,7 +29,8 @@ jobs:
 
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - name: Set environment variables
         run: |
@@ -50,7 +51,6 @@ jobs:
 
       - name: Upload imagedefinitions.json as artifact
         uses: actions/upload-artifact@v4
-    with:
-        name: imagedefinitions
-        path: imagedefinitions.json
-
+        with:
+          name: imagedefinitions
+          path: imagedefinitions.json
