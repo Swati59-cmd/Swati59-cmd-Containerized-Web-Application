@@ -33,7 +33,7 @@ resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
 }
 
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "${var.environment}-ecs-instanceDemo4"
+  name = "${var.environment}-ecs-instanceDemo5"
   role = aws_iam_role.ecs_instance_role.name
 }
 
