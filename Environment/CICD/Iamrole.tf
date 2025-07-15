@@ -116,28 +116,32 @@ resource "aws_iam_role_policy_attachment" "codepipeline_codebuild_access_attach"
 
 # IAM for CodeBuild
 
-resource "aws_iam_policy" "codebuild_cloudwatch_logs" {
-  name = "${var.env}-CodeBuildCloudWatchLogsAccess"
+resource "aws_iam_policy" "codebuild_logs_policy" {
+  name        = "CodeBuildCloudWatchLogsPolicy"
+  description = "Allows CodeBuild to write logs to CloudWatch"
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
-        ],
-        Resource = "arn:aws:logs:us-east-1:648908580279:log-group:/aws/codebuild/*"
+        ]
+        Resource = [
+          "arn:aws:logs:us-east-1:${var.aws_account_id}:log-group:/aws/codebuild/*"
+        ]
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch_logs_attach" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_cloudwatch_logs.arn
+resource "aws_iam_role_policy_attachment" "attach_logs_policy_to_codebuild" {
+  role       = aws_iam_role.codebuild_role.name # This must match the actual CodeBuild role name in your TF
+  policy_arn = aws_iam_policy.codebuild_logs_policy.arn
 }
+
 
 resource "aws_iam_policy" "codebuild_s3_read" {
   name = "${var.env}-CodeBuildS3ReadAccess"
