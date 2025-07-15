@@ -69,22 +69,30 @@ resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_policy" {
   policy_arn = aws_iam_policy.codebuild_s3_access.arn
 }
 
-resource "aws_iam_policy" "codepipeline_codestar_connection" {
-  name = "${var.env}-AllowCodeStarConnectionUse"
+resource "aws_iam_policy" "allow_codestar_connection" {
+  name        = "AllowUseCodeStarConnection"
+  description = "Allows CodePipeline to use the CodeStar connection"
   policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = "codestar-connections:UseConnection",
-      Resource = "arn:aws:codeconnections:us-east-1:648908580279:connection/c1d3b7ac-4e84-4c71-95fa-694ee7132651"
-    }]
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "codestar-connections:UseConnection"
+        ]
+        Resource = "arn:aws:codeconnections:us-east-1:851725602228:connection/ab62ca85-1804-4eef-a633-058b9e8ff4cf"
+      }
+    ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "codepipeline_codestar_connection_attach" {
+resource "aws_iam_role_policy_attachment" "attach_codestar_connection" {
   role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.codepipeline_codestar_connection.arn
+  policy_arn = aws_iam_policy.allow_codestar_connection.arn
 }
+
+
+
 
 resource "aws_iam_policy" "codepipeline_codebuild_access" {
   name = "${var.env}-CodePipelineStartBuildAccess"
