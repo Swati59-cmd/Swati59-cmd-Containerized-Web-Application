@@ -183,3 +183,28 @@ resource "aws_iam_role_policy_attachment" "codepipeline_s3_bucket_explicit_acces
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_artifact_bucket_access.arn
 }
+resource "aws_iam_policy" "codepipeline_artifact_test_policy" {
+  name = "${var.env}-CodePipelineS3TestAccess"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid : "AllowS3ReadWriteArtifacts",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
+        Resource = [
+          "arn:aws:s3:::dev-artifact-devproject-851725602228/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_test_s3_attach" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_artifact_test_policy.arn
+}
