@@ -1,8 +1,10 @@
 version: 0.2
 env:
-      AWS_ACCOUNT_ID: "851725602228"
-      AWS_REGION: "us-east-1"
-      ECR_REPO_NAME: "devpython"
+  variables:
+    AWS_REGION: "us-east-1"
+    AWS_ACCOUNT_ID: "851725602228"
+    ECR_REPO_NAME: "devpython"
+
 phases:
   pre_build:
     commands:
@@ -12,9 +14,10 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $ECR_REPO_NAME:${{ github.sha }} .
+      - docker build -t $ECR_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION .
       - docker tag $ECR_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
   post_build:
     commands:
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+
