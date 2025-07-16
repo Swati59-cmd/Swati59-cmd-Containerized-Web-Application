@@ -154,12 +154,12 @@ resource "aws_iam_policy" "codebuild_s3_read" {
           "s3:GetObject",
           "s3:GetObjectVersion"
         ],
-        Resource = "arn:aws:s3:::artifact-devproject/dev-Pipeline/*"
+        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
       },
       {
         Effect   = "Allow",
         Action   = "s3:ListBucket",
-        Resource = "arn:aws:s3:::artifact-devproject"
+        Resource = "arn:aws:s3:::devbucketcicd"
       }
     ]
   })
