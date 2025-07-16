@@ -1,9 +1,9 @@
 provider "aws" {
   region = "us-east-1"
 }
-
 resource "aws_s3_bucket" "codepipeline_artifacts" {
-  bucket = var.bucket_name
+  bucket        = "${var.env}-artifact-devproject-${var.aws_account_id}"
+  force_destroy = true
 }
 
 resource "aws_codestarconnections_connection" "github" {
