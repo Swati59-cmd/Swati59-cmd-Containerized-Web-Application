@@ -160,26 +160,39 @@ resource "aws_iam_policy" "codebuild_s3_access" {
     Version = "2012-10-17",
     Statement = [
       {
+        Sid    = "S3ArtifactAccess",
         Effect = "Allow",
         Action = [
           "s3:PutObject",
           "s3:GetObject",
-          "s3:GetObjectVersion",
+          "s3:GetObjectVersion"
+        ],
+        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*" # Access to files inside folder
+      },
+      {
+        Sid    = "S3ArtifactList",
+        Effect = "Allow",
+        Action = [
           "s3:ListBucket"
         ],
-        Resource = [
-          "arn:aws:s3:::devbucketcicd",
-          "arn:aws:s3:::devbucketcicd/*"
-        ]
+        Resource = "arn:aws:s3:::devbucketcicd" # Access to list objects at bucket level
       }
     ]
   })
 }
-
+# Attach to CodeBuild Role
 resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_policy" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = aws_iam_policy.codebuild_s3_access.arn
 }
+
+# Attach to CodePipeline Role
+resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codebuild_s3_access.arn
+}
+
+
 
 resource "aws_iam_policy" "codebuild_logs_policy" {
   name = "CodeBuildCloudWatchLogsPolicy"
