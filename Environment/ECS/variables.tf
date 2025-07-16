@@ -13,7 +13,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "EC2 instance type for ECS cluster"
   type        = string
-  default     = "t3.medium"
+  default     = "t2.medium"
 }
 
 variable "key_name" {
