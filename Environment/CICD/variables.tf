@@ -3,7 +3,7 @@ variable "env" {
 }
 variable "bucket_name" {
   type    = string
-  default = "devbucketcicd"
+  default = "artifact-devproject"
 }
 
 variable "github_branch" {
