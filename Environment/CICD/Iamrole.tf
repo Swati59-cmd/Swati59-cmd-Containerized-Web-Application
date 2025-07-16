@@ -52,8 +52,8 @@ resource "aws_iam_policy" "codebuild_s3_access" {
           "s3:ListBucket"
         ],
         Resource = [
-          "arn:aws:s3:::${var.bucket_name}",
-          "arn:aws:s3:::${var.bucket_name}/*"
+          "arn:aws:s3:::devbucketcicd",
+          "arn:aws:s3:::devbucketcicd/*"
         ]
       }
     ]
