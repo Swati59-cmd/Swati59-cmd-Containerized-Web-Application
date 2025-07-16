@@ -2,11 +2,7 @@ variable "env" {
   type    = string
   default = "dev"
 }
-variable "bucket_name" {
-  type    = string
-  default = "artifact-devproject"
 
-}
 
 variable "github_branch" {
   type    = string
