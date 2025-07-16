@@ -1,5 +1,6 @@
-
-
+# -----------------------------------------------
+# IAM Role for CodePipeline
+# -----------------------------------------------
 resource "aws_iam_role" "codepipeline_role" {
   name = "${var.env}-codepipeline-role"
 
@@ -15,18 +16,20 @@ resource "aws_iam_role" "codepipeline_role" {
   })
 }
 
+# Attach Managed Policy for basic CodePipeline permissions
 resource "aws_iam_role_policy_attachment" "codepipeline_attach" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_ReadOnlyAccess"
 }
 
+# S3 Access for CodePipeline
 resource "aws_iam_policy" "codepipeline_artifact_access" {
   name = "${var.env}-CodePipelineArtifactS3Access"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "S3ArtifactReadWrite"
+        Sid    = "S3ArtifactReadWrite",
         Effect = "Allow",
         Action = [
           "s3:GetObject",
@@ -34,16 +37,12 @@ resource "aws_iam_policy" "codepipeline_artifact_access" {
           "s3:PutObject",
           "s3:PutObjectAcl"
         ],
-        Resource = [
-          "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
-        ]
+        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
       },
       {
-        Sid    = "S3ArtifactList"
-        Effect = "Allow",
-        Action = [
-          "s3:ListBucket"
-        ],
+        Sid      = "S3ArtifactList",
+        Effect   = "Allow",
+        Action   = ["s3:ListBucket"],
         Resource = "arn:aws:s3:::devbucketcicd"
       }
     ]
@@ -55,17 +54,16 @@ resource "aws_iam_role_policy_attachment" "codepipeline_s3_attach" {
   policy_arn = aws_iam_policy.codepipeline_artifact_access.arn
 }
 
+# Allow CodeStar connection
 resource "aws_iam_policy" "allow_codestar_connection" {
   name = "AllowUseCodeStarConnection"
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = ["codestar-connections:UseConnection"],
-        Resource = "arn:aws:codeconnections:us-east-1:851725602228:connection/ab62ca85-1804-4eef-a633-058b9e8ff4cf"
-      }
-    ]
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["codestar-connections:UseConnection"],
+      Resource = "arn:aws:codeconnections:us-east-1:851725602228:connection/ab62ca85-1804-4eef-a633-058b9e8ff4cf"
+    }]
   })
 }
 
@@ -74,6 +72,7 @@ resource "aws_iam_role_policy_attachment" "attach_codestar_connection" {
   policy_arn = aws_iam_policy.allow_codestar_connection.arn
 }
 
+# Allow CodePipeline to start CodeBuild
 resource "aws_iam_policy" "codepipeline_codebuild_access" {
   name = "${var.env}-CodePipelineStartBuildAccess"
   policy = jsonencode({
@@ -94,6 +93,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline_codebuild_access_attach"
   policy_arn = aws_iam_policy.codepipeline_codebuild_access.arn
 }
 
+# ECS Deploy Access
 resource "aws_iam_policy" "codepipeline_ecs_access" {
   name = "${var.env}-CodePipelineECSAccess"
   policy = jsonencode({
@@ -130,10 +130,9 @@ resource "aws_iam_role_policy_attachment" "codepipeline_ecs_attach" {
   policy_arn = aws_iam_policy.codepipeline_ecs_access.arn
 }
 
-# ----------------------------
-# CodeBuild IAM Role & Policies
-# ----------------------------
-
+# -----------------------------------------------
+# IAM Role for CodeBuild
+# -----------------------------------------------
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.env}-codebuild-service-role"
 
@@ -149,11 +148,13 @@ resource "aws_iam_role" "codebuild_role" {
   })
 }
 
+# Attach managed policy for basic access
 resource "aws_iam_role_policy_attachment" "codebuild_attach" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
+# S3 access for artifacts
 resource "aws_iam_policy" "codebuild_s3_access" {
   name = "${var.env}-CodeBuildS3Access"
   policy = jsonencode({
@@ -167,33 +168,24 @@ resource "aws_iam_policy" "codebuild_s3_access" {
           "s3:GetObject",
           "s3:GetObjectVersion"
         ],
-        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*" # Access to files inside folder
+        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
       },
       {
-        Sid    = "S3ArtifactList",
-        Effect = "Allow",
-        Action = [
-          "s3:ListBucket"
-        ],
-        Resource = "arn:aws:s3:::devbucketcicd" # Access to list objects at bucket level
+        Sid      = "S3ArtifactList",
+        Effect   = "Allow",
+        Action   = ["s3:ListBucket"],
+        Resource = "arn:aws:s3:::devbucketcicd"
       }
     ]
   })
 }
-# Attach to CodeBuild Role
+
 resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_policy" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = aws_iam_policy.codebuild_s3_access.arn
 }
 
-# Attach to CodePipeline Role
-resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3" {
-  role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.codebuild_s3_access.arn
-}
-
-
-
+# CloudWatch Logs access
 resource "aws_iam_policy" "codebuild_logs_policy" {
   name = "CodeBuildCloudWatchLogsPolicy"
   policy = jsonencode({
@@ -206,9 +198,7 @@ resource "aws_iam_policy" "codebuild_logs_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Resource = [
-          "arn:aws:logs:us-east-1:${var.aws_account_id}:log-group:/aws/codebuild/*"
-        ]
+        Resource = "arn:aws:logs:us-east-1:${var.aws_account_id}:log-group:/aws/codebuild/*"
       }
     ]
   })
@@ -219,35 +209,8 @@ resource "aws_iam_role_policy_attachment" "attach_logs_policy_to_codebuild" {
   policy_arn = aws_iam_policy.codebuild_logs_policy.arn
 }
 
-resource "aws_iam_policy" "codebuild_s3_read" {
-  name = "${var.env}-CodeBuildS3ReadAccess"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:GetObjectVersion"
-        ],
-        Resource = "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = "s3:ListBucket",
-        Resource = "arn:aws:s3:::devbucketcicd"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "codebuild_s3_read_attach" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_s3_read.arn
-}
-
+# ECR Access
 resource "aws_iam_role_policy_attachment" "codebuild_ecr_access" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
-
