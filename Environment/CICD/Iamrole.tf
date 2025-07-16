@@ -157,3 +157,30 @@ resource "aws_iam_role_policy_attachment" "codebuild_ecr_access" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
+resource "aws_iam_policy" "codepipeline_artifact_bucket_access" {
+  name = "${var.env}-CodePipelineS3Access"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowPipelineArtifactBucketAccess",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:GetObjectVersion",
+          "s3:GetBucketVersioning"
+        ],
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.codepipeline_artifacts.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.codepipeline_artifacts.bucket}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_s3_bucket_explicit_access" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_artifact_bucket_access.arn
+}
