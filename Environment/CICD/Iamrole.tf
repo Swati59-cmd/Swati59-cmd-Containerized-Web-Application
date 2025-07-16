@@ -20,12 +20,13 @@ resource "aws_iam_role_policy_attachment" "codepipeline_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_ReadOnlyAccess"
 }
 
-resource "aws_iam_policy" "codepipeline_artifact_bucket_access" {
-  name = "${var.env}-CodePipelineS3ArtifactAccess"
+resource "aws_iam_policy" "codepipeline_artifact_access" {
+  name = "${var.env}-CodePipelineArtifactS3Access"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
+        Sid    = "S3ArtifactReadWrite"
         Effect = "Allow",
         Action = [
           "s3:GetObject",
@@ -34,11 +35,11 @@ resource "aws_iam_policy" "codepipeline_artifact_bucket_access" {
           "s3:PutObjectAcl"
         ],
         Resource = [
-          "arn:aws:s3:::devbucketcicd",
-          "arn:aws:s3:::devbucketcicd/*"
+          "arn:aws:s3:::devbucketcicd/dev-Pipeline/*"
         ]
       },
       {
+        Sid    = "S3ArtifactList"
         Effect = "Allow",
         Action = [
           "s3:ListBucket"
@@ -49,9 +50,9 @@ resource "aws_iam_policy" "codepipeline_artifact_bucket_access" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3_artifacts" {
+resource "aws_iam_role_policy_attachment" "codepipeline_s3_attach" {
   role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.codepipeline_artifact_bucket_access.arn
+  policy_arn = aws_iam_policy.codepipeline_artifact_access.arn
 }
 
 resource "aws_iam_policy" "allow_codestar_connection" {
