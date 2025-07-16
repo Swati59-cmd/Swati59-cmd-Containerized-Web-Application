@@ -1,5 +1,3 @@
-
-
 # -----------------------------
 # CodePipeline IAM Role
 # -----------------------------
@@ -25,28 +23,9 @@ resource "aws_iam_role_policy_attachment" "codepipeline_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_ReadOnlyAccess"
 }
 
-# Full S3 Admin Access Policy (Custom)
-resource "aws_iam_policy" "s3_admin_access" {
-  name = "${var.env}-S3FullAccess"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid:    "S3AdminAccess",
-        Effect = "Allow",
-        Action = "s3:*",
-        Resource = [
-          "arn:aws:s3:::*",
-          "arn:aws:s3:::*/*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3_admin" {
+resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3_full" {
   role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.s3_admin_access.arn
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 # Allow CodePipeline to use CodeStar connection
@@ -107,8 +86,8 @@ resource "aws_iam_policy" "codepipeline_ecs_access" {
         Resource = "*"
       },
       {
-        Effect = "Allow",
-        Action = ["iam:PassRole"],
+        Effect   = "Allow",
+        Action   = ["iam:PassRole"],
         Resource = "*",
         Condition = {
           StringLike = {
@@ -150,9 +129,9 @@ resource "aws_iam_role_policy_attachment" "codebuild_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_admin" {
+resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_full" {
   role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.s3_admin_access.arn
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_policy" "codebuild_cloudwatch_logs" {
