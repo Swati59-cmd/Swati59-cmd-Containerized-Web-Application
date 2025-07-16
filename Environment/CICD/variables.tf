@@ -2,8 +2,8 @@ variable "env" {
   type = string
 }
 variable "bucket_name" {
-  type = string
-
+  type    = string
+  default = "devbucketcicd"
 }
 
 variable "github_branch" {
