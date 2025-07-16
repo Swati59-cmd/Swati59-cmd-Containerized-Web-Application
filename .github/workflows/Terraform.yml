@@ -36,9 +36,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: modules/ECS
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: modules/ECS
+     # - name: Destroy Terraform
+      #  run: terraform destroy -auto-approve
+       # working-directory: modules/ECS
 
         
       - name: Terraform Init - CICD
@@ -49,6 +49,6 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: modules/CICD
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: modules/CICD
+      #- name: Destroy Terraform
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/CICD
