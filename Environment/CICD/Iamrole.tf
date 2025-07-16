@@ -1,10 +1,3 @@
-
-resource "aws_s3_bucket" "codepipeline_artifacts" {
-  bucket        = "${var.env}-artifact-devproject-${var.aws_account_id}"
-  force_destroy = true
-}
-
-
 resource "aws_iam_role" "codepipeline_role" {
   name = "${var.env}-codepipeline-role"
 
