@@ -76,7 +76,7 @@ resource "aws_iam_policy" "codepipeline_codestar_connection" {
     Statement = [{
       Effect   = "Allow",
       Action   = "codestar-connections:UseConnection",
-      Resource = "arn:aws:codeconnections:us-east-1:648908580279:connection/c1d3b7ac-4e84-4c71-95fa-694ee7132651"
+      Resource = "arn:aws:codeconnections:us-east-1:851725602228:connection/ab62ca85-1804-4eef-a633-058b9e8ff4cf"
     }]
   })
 }
@@ -120,7 +120,7 @@ resource "aws_iam_policy" "codebuild_cloudwatch_logs" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Resource = "arn:aws:logs:us-east-1:648908580279:log-group:/aws/codebuild/*"
+        Resource = "arn:aws:logs:us-east-1:851725602228:log-group:/aws/codebuild/*"
       }
     ]
   })
