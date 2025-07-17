@@ -59,7 +59,8 @@ resource "aws_iam_policy" "codepipeline_artifact_bucket_access" {
           "s3:GetObject",
           "s3:PutObject",
           "s3:GetObjectVersion",
-          "s3:GetBucketVersioning"
+          "s3:GetBucketVersioning",
+          "s3:ListBucket"
         ],
         Resource : [
           "arn:aws:s3:::dev-artifact-devproject-851725602228",
