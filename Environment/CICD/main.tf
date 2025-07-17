@@ -5,6 +5,13 @@ resource "aws_s3_bucket" "codepipeline_artifacts" {
   bucket        = "${var.env}-artifact-devproject-${var.aws_account_id}"
   force_destroy = true
 }
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.codepipeline_artifacts.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 resource "aws_codestarconnections_connection" "github" {
   name          = "cicd-github"
@@ -43,7 +50,7 @@ resource "aws_codepipeline" "my_pipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = "dev-artifact-devproject-851725602228"
+    location = aws_s3_bucket.codepipeline_artifacts.bucket
     type     = "S3"
   }
   stage {
