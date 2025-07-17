@@ -46,10 +46,6 @@ resource "aws_codepipeline" "my_pipeline" {
     location = "dev-artifact-devproject-851725602228"
     type     = "S3"
   }
-
-
-
-
   stage {
     name = "Source"
     action {
