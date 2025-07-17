@@ -36,38 +36,34 @@ resource "aws_iam_role_policy_attachment" "codebuild_attach" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
-
-
-resource "aws_iam_policy" "codebuild_s3_access" {
-  name = "${var.env}-CodeBuildS3Access"
+resource "aws_iam_policy" "codepipeline_s3_full_access" {
+  name = "${var.env}-CodePipeline-S3FullAccess"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:GetObjectVersion",
-          "s3:ListBucket"
+        Sid : "FullAccessToS3",
+        Effect : "Allow",
+        Action : [
+          "s3:*"
         ],
-        Resource = [
-          "arn:aws:s3:::dev-artifact-devproject-851725602228",
-          "arn:aws:s3:::dev-artifact-devproject-851725602228/*"
-        ]
+        Resource : "*"
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_codepipeline_s3" {
+resource "aws_iam_role_policy_attachment" "attach_s3_policy_pipeline" {
   role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.codebuild_s3_access.arn
+  policy_arn = aws_iam_policy.codepipeline_s3_full_access.arn
 }
-resource "aws_iam_role_policy_attachment" "attach_codebuild_s3_policy" {
+
+resource "aws_iam_role_policy_attachment" "attach_s3_policy_codebuild" {
   role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_s3_access.arn
+  policy_arn = aws_iam_policy.codepipeline_s3_full_access.arn
 }
+
+
 
 resource "aws_iam_policy" "codepipeline_codestar_connection" {
   name = "${var.env}-AllowCodeStarConnectionUse"
@@ -131,32 +127,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch_logs_attach" {
   policy_arn = aws_iam_policy.codebuild_cloudwatch_logs.arn
 }
 
-resource "aws_iam_policy" "codebuild_s3_read" {
-  name = "${var.env}-CodeBuildS3ReadAccess"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:GetObjectVersion"
-        ],
-        Resource = "arn:aws:s3:::dev-artifact-devproject-851725602228/dev-Pipeline/*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = "s3:ListBucket",
-        Resource = "arn:aws:s3:::dev-artifact-devproject-851725602228"
-      }
-    ]
-  })
-}
 
-resource "aws_iam_role_policy_attachment" "codebuild_s3_read_attach" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_s3_read.arn
-}
 
 resource "aws_iam_role_policy_attachment" "codebuild_ecr_access" {
   role       = aws_iam_role.codebuild_role.name
