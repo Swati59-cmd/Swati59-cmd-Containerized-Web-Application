@@ -164,7 +164,7 @@ resource "aws_ecs_service" "service" {
   launch_type     = "EC2"
   network_configuration {
     subnets         = module.vpc.public_subnet_ids
-    security_groups = aws_security_group.ecs_instance_sg.id
+    security_groups = [aws_security_group.ecs_instance_sg.id]
 
     assign_public_ip = false # or true if needed
   }
