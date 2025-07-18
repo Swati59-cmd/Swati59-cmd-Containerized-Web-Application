@@ -3,10 +3,6 @@ name: App CI/CD
 on:
   push:
     branches: [main, dev, stage]
-    paths:
-      - 'app.py'
-      - 'Dockerfile'
-      - '.github/workflows/ApplicationCicd.yml'
 
 jobs:
   deploy:
