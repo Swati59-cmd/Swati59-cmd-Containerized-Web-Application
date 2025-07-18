@@ -29,11 +29,7 @@ variable "image_tag" {
   type        = string
 }
 
-variable "ecr_repo_name" {
-  description = "ECR repository name"
-  type        = string
-  default     = "devpython"
-}
+
 
 variable "ecr_repo_name" {
   type    = string
