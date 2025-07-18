@@ -162,7 +162,11 @@ resource "aws_ecs_service" "service" {
   task_definition = aws_ecs_task_definition.task.arn
   desired_count   = 2
   launch_type     = "EC2"
-
+  network_configuration {
+    subnets          = module.vpc.public_subnet_ids
+    security_groups  = security_groups.ecs_instance_sg.id
+    assign_public_ip = false # or true if needed
+  }
 
 
   load_balancer {
