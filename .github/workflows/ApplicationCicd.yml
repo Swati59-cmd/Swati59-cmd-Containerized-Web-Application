@@ -48,11 +48,11 @@ jobs:
       working-directory: modules/ECS
  
     - name: Terraform Plan (App Update)
-       run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -out=tfplan
+      run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -out=tfplan
       working-directory: modules/ECS
  
     - name: Terraform Apply (App Update)
-       run: terraform apply -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -auto-approve tfplan
+      run: terraform apply -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -auto-approve tfplan
       working-directory: modules/ECS
  
     #- name: Terraform Destroy
