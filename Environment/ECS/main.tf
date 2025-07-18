@@ -133,8 +133,8 @@ resource "aws_ecs_task_definition" "task" {
   family                   = "${var.environment}-app"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "128"
+  memory                   = "256"
 
   container_definitions = jsonencode([
     {
