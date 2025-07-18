@@ -33,6 +33,14 @@ variable "ecr_repo_name" {
   type        = string
   default     = "devpython"
 }
+variable "aws_account_id" {
+  type    = number
+  default = 851725602228
+}
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
 
 
 
