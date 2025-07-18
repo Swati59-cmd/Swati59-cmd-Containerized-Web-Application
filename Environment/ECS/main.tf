@@ -160,7 +160,7 @@ resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 2
+  desired_count   = 1
   launch_type     = "EC2"
   network_configuration {
     subnets         = module.vpc.public_subnet_ids
