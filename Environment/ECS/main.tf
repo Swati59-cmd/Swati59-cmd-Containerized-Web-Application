@@ -132,14 +132,14 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.environment}-app"
   requires_compatibilities = ["EC2"]
-  network_mode             = "bridge"
+  network_mode             = "awsvpc"
   cpu                      = "256"
   memory                   = "512"
 
   container_definitions = jsonencode([
     {
       name      = "app"
-      image     = var.image
+      image     = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
       essential = true
       portMappings = [
         {

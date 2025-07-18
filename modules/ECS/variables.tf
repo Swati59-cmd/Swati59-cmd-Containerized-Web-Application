@@ -23,12 +23,15 @@ variable "key_name" {
 }
 
 
-variable "image" {
-  description = "ECR repository URI without tag"
+variable "image_tag" {
+  description = "Docker image tag for ECS task definition"
   type        = string
-  default     = "851725602228.dkr.ecr.us-east-1.amazonaws.com/devpython"
 }
 
+variable "ecr_repo_name" {
+  description = "ECR repository name"
+  type        = string
+}
 
 
 
