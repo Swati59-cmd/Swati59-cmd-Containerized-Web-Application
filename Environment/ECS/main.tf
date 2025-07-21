@@ -127,7 +127,7 @@ resource "aws_ecs_service" "service" {
   launch_type     = "EC2"
   network_configuration {
     subnets          = module.vpc_stage.public_subnet_ids
-    security_groups  = [aws_security_group.ecs_sg]
+    security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
 
