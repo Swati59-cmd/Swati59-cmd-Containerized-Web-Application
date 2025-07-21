@@ -1,10 +1,8 @@
 module "ECSP" {
-  source = "../../Environment/ECS"
-
+  source        = "../../Environment/ECS"
   environment   = var.environment
-  image         = var.image
-  instance_type = var.instance_type
-  key_name      = var.key_name
+  ecr_repo_name = "stagepython"
+  image_tag     = var.image_tag
 }
 
 

@@ -22,9 +22,26 @@ variable "key_name" {
   default     = "lambda"
 }
 
-variable "image" {
-  description = "Docker image to be used in ECS task"
+
+variable "image_tag" {
+  description = "Docker image tag for ECS task definition"
   type        = string
-  default     = "851725602228.dkr.ecr.us-east-1.amazonaws.com/stagepython"
 }
 
+variable "ecr_repo_name" {
+  type    = string
+  default = "stagepython"
+}
+variable "aws_account_id" {
+  type    = number
+  default = 851725602228
+}
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate"
+  type        = string
+  default     = "arn:aws:acm:us-east-1:851725602228:certificate/84a5d456-bb51-4034-b2ff-414cf3fd5029"
+}

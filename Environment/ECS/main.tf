@@ -98,19 +98,19 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.environment}-app"
   requires_compatibilities = ["EC2"]
-  network_mode             = "bridge"
-  cpu                      = "256"
-  memory                   = "512"
+  network_mode             = "awsvpc"
+  cpu                      = "128"
+  memory                   = "256"
 
   container_definitions = jsonencode([
     {
       name      = "app"
-      image     = var.image
+      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.ecr_repo_name}:${var.image_tag}"
       essential = true
       portMappings = [
         {
           containerPort = 5000,
-          hostPort      = 80
+          hostPort      = 5000
         }
       ]
     }
@@ -123,8 +123,13 @@ resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 2
+  desired_count   = 1
   launch_type     = "EC2"
+  network_configuration {
+    subnets          = module.vpc.public_subnet_ids
+    security_groups  = [aws_security_group.ecs_instance_sg.id]
+    assign_public_ip = false
+  }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
