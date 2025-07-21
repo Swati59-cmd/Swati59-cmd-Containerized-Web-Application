@@ -43,5 +43,10 @@ variable "aws_region" {
   type    = string
   default = "us-east-1"
 }
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate"
+  type        = string
+  default     = "arn:aws:acm:us-east-1:851725602228:certificate/cb556548-3b63-4ca3-b5ae-9f6a1ab4dbdd"
+}
 
 
