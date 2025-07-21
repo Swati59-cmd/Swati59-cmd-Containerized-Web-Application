@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "main" {
   name = "${var.environment}-ecs-cluster"
+  tags = {
+    Name        = "${var.environment}-listener"
+    Environment = var.environment
+    Project     = "swati-project"
+  }
 }
 
 resource "aws_iam_role" "ecs_instance_role" {
@@ -23,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
 }
 
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "${var.environment}-ecs-instance-profileDemo"
+  name = "${var.environment}-ecs-instance-profileDemo2"
   role = aws_iam_role.ecs_instance_role.name
 }
 
@@ -47,7 +52,8 @@ EOF
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "${var.environment}-ecs-instance"
+      Name    = "${var.environment}-ecs-instance"
+      project = "Swati-project"
     }
   }
 }
@@ -70,6 +76,11 @@ resource "aws_autoscaling_group" "ecs_asg" {
   tag {
     key                 = "Name"
     value               = "${var.environment}-ecs-instance"
+    propagate_at_launch = true
+  }
+  tag {
+    key                 = "Project"
+    value               = "swati-project"
     propagate_at_launch = true
   }
 }
