@@ -43,14 +43,14 @@ jobs:
       run: terraform init
       working-directory: modules/ECS
 
-    - name: Terraform Plan (App Update)
+    - name: Terraform Plan 
       run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" -out=tfplan
       working-directory: modules/ECS
 
-    - name: Terraform Apply (App Update)
+    - name: Terraform Apply 
       run: terraform apply -auto-approve tfplan
       working-directory: modules/ECS
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}"
-      working-directory: modules/ECS
+   # - name: Terraform Destroy
+    #  run: terraform destroy -auto-approve -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}"
+     # working-directory: modules/ECS
