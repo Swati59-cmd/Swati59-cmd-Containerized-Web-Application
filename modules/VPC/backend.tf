@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket = "swatistatefile"
     key    = "vpc-main/terraform.tfstate"
-    region = "eu-north-1"
+    region = "us-east-1"
 
   }
 }
