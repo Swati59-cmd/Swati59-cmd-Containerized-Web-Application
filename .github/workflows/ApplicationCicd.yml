@@ -1,52 +1,56 @@
-name: Terraform Deployment
+name: App CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: main
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPO_NAME: mainpython
+      IMAGE_TAG: ${{ github.sha }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.6.0
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
 
-      # VPC first
-      #- name: Terraform Init - VPC
-       # run: terraform init
-        #working-directory: modules/VPC
+    - name: Build and Push Docker Image
+      run: |
+        REPO_URI=$(aws ecr describe-repositories --repository-names $ECR_REPO_NAME --query 'repositories[0].repositoryUri' --output text --region $AWS_REGION)
+        docker build -t $REPO_URI:$IMAGE_TAG .
+        docker push $REPO_URI:$IMAGE_TAG
+        echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
 
-      #- name: Terraform Apply - VPC
-       # run: terraform apply -auto-approve
-        #working-directory: modules/VPC
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.6
 
-      #- name: Destroy Terraform
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/VPC
+    - name: Terraform Init
+      run: terraform init
+      working-directory: modules/ECS
 
-      # ECS second (after VPC is ready)
-      - name: Terraform Init - ECS
-        run: terraform init
-        working-directory: modules/ECS
+    - name: Terraform Plan 
+      run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" -out=tfplan
+      working-directory: modules/ECS
 
-      - name: Terraform Apply - ECS
-        run: terraform apply -auto-approve
-        working-directory: modules/ECS
+    - name: Terraform Apply 
+      run: terraform apply -auto-approve tfplan
+      working-directory: modules/ECS
 
-      - name: Destroy Terraform
-        run: terraform destroy -auto-approve
-        working-directory: modules/ECS
+   # - name: Terraform Destroy
+    #  run: terraform destroy -auto-approve -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}"
+     # working-directory: modules/ECS
