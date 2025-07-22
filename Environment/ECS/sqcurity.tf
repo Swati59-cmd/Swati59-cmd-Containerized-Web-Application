@@ -1,6 +1,6 @@
 resource "aws_security_group" "ecs_sg" {
   name   = "${var.environment}-ecs-sg"
-  vpc_id = module.vpc_stage.vpc_id
+  vpc_id = module.vpc_main.vpc_id
 
 
   ingress {
@@ -35,7 +35,7 @@ resource "aws_security_group" "ecs_sg" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.environment}-alb-sg"
   description = "Allow HTTP and HTTPS access to ALB"
-  vpc_id      = module.vpc_stage.vpc_id
+  vpc_id      = module.vpc_main.vpc_id
 
 
 
