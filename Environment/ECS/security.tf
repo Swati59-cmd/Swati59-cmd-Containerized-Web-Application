@@ -2,13 +2,13 @@ resource "aws_security_group" "ecs_instance_sg" {
   name   = "Projectecs-sg1"
   vpc_id = module.vpc.vpc_id
 
-  ingress {
-    description = "Allow SSH from your IP (change as needed)"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  #ingress {
+   # description = "Allow SSH from your IP (change as needed)"
+    #from_port   = 22
+    #to_port     = 22
+    #protocol    = "tcp"
+    #cidr_blocks = ["0.0.0.0/0"]
+  #}
 
   ingress {
     description = "Allow HTTP"
