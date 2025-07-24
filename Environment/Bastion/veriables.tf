@@ -10,6 +10,6 @@ variable "key_name" {
 }
 
 variable "ami" {
-  type    = number
+  type    = string
   default = "ami-0cbbe2c6a1bb2ad63"
 }
