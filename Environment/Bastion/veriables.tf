@@ -11,5 +11,5 @@ variable "key_name" {
 
 variable "ami" {
   type    = number
-  default = "ami-02457590d33d576c3"
+  default = "ami-0cbbe2c6a1bb2ad63"
 }
