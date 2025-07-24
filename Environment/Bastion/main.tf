@@ -1,7 +1,7 @@
 resource "aws_instance" "bastion" {
   ami                    = var.ami
   instance_type          = var.instance_type
-  subnet_id              = module.vpcmodule.public_subnet_ids
+  subnet_id              = module.vpcmodule.public_subnet_ids[0]
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
