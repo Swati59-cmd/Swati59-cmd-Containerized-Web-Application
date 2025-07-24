@@ -13,7 +13,7 @@ resource "aws_instance" "bastion" {
 }
 
 resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-sg"
+  name        = "Main-bastion-sg"
   description = "Allow SSH from my IP to bastion host"
   vpc_id      = aws_vpc.main.id
 
