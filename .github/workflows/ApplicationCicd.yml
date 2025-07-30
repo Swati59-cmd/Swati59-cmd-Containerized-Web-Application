@@ -1,138 +1,56 @@
 name: App CI/CD
-
+ 
 on:
   push:
-    branches: [dev]
-  workflow_dispatch:
-    inputs:
-      destroy:
-        description: "Set to true to destroy infrastructure"
-        required: false
-        default: "false"
-
+    branches: [main, dev, stage]
+ 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: us-east-1 
+      AWS_REGION: us-east-1
       ECR_REPO_NAME: devpython
       IMAGE_TAG: ${{ github.sha }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-
-    outputs:
-      image_tag: ${{ env.IMAGE_TAG }}
-      ecr_repo_name: ${{ env.ECR_REPO_NAME }}
-      aws_region: ${{ env.AWS_REGION }}
-      #aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
-
+ 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and Push Docker Image
-        run: |
-          REPO_URI=$(aws ecr describe-repositories --repository-names $ECR_REPO_NAME --query 'repositories[0].repositoryUri' --output text --region $AWS_REGION)
-          docker build -t $REPO_URI:$IMAGE_TAG .
-          docker push $REPO_URI:$IMAGE_TAG
-          echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: modules/ECS
-
-      - name: Terraform Plan
-        run: |
-             terraform -chdir=modules/ECS plan \
-                -var="image_tag=${{ env.IMAGE_TAG }}" \
-                -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-                -var="aws_region=${{ env.AWS_REGION }}" \
-                -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" \
-                -out=tfplan
-
-      - name: Upload Terraform Plan Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan
-          path: modules/ECS/tfplan
-
-  apply:
-    name: Terraform Apply (Manual Approval)
-    needs: deploy
-    runs-on: ubuntu-latest
-    environment:
-      name: dev  # This must exist under GitHub repo → Settings → Environments
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: modules/ECS
-
-      - name: Download Terraform Plan Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan
-          path: modules/ECS
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
-        working-directory: modules/ECS
-
-  destroy:
-    name: Terraform Destroy
-    runs-on: ubuntu-latest
-    if: github.event.inputs.destroy == 'true'
-    needs: deploy
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: modules/ECS
-
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: modules/ECS
+    - name: Checkout code
+      uses: actions/checkout@v3
+ 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+ 
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+ 
+    - name: Build and Push Docker Image
+      run: |
+        REPO_URI=$(aws ecr describe-repositories --repository-names $ECR_REPO_NAME --query 'repositories[0].repositoryUri' --output text --region $AWS_REGION)
+        docker build -t $REPO_URI:$IMAGE_TAG .
+        docker push $REPO_URI:$IMAGE_TAG
+        echo "REPO_URI=$REPO_URI" >> $GITHUB_ENV
+ 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.6
+ 
+    - name: Terraform Init
+      run: terraform init
+      working-directory: modules/ECS
+ 
+    - name: Terraform Plan
+      run: terraform plan -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" -out=tfplan
+      working-directory: modules/ECS
+ 
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+      working-directory: modules/ECS
+ 
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -var="image_tag=${{ env.IMAGE_TAG }}" -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" -var="aws_region=${{ env.AWS_REGION }}" -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}"
+      working-directory: modules/ECS
