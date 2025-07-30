@@ -56,13 +56,14 @@ jobs:
         working-directory: modules/ECS
 
       - name: Terraform Plan
-        run: terraform plan \
-          -var="image_tag=${{ env.IMAGE_TAG }}" \
-          -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-          -var="aws_region=${{ env.AWS_REGION }}" \
-          -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" \
-          -out=tfplan
         working-directory: modules/ECS
+        run: |
+          terraform plan \
+            -var="image_tag=${{ env.IMAGE_TAG }}" \
+            -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
+            -var="aws_region=${{ env.AWS_REGION }}" \
+            -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" \
+            -out=tfplan
 
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
@@ -75,7 +76,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     environment:
-      name: dev   # must match GitHub Environment name to enable manual approval
+      name: dev  # Must match GitHub Environment name
 
     steps:
       - name: Checkout code
@@ -113,7 +114,7 @@ jobs:
     if: github.event.inputs.destroy == 'true'
     runs-on: ubuntu-latest
     environment:
-      name: dev  # must match GitHub Environment
+      name: dev  # Must match GitHub Environment
 
     steps:
       - name: Checkout code
@@ -136,9 +137,10 @@ jobs:
         working-directory: modules/ECS
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve \
-          -var="image_tag=${{ needs.deploy.outputs.image_tag }}" \
-          -var="ecr_repo_name=${{ needs.deploy.outputs.ecr_repo_name }}" \
-          -var="aws_region=${{ needs.deploy.outputs.aws_region }}" \
-          -var="aws_account_id=${{ needs.deploy.outputs.aws_account_id }}"
+        run: |
+          terraform destroy -auto-approve \
+            -var="image_tag=${{ needs.deploy.outputs.image_tag }}" \
+            -var="ecr_repo_name=${{ needs.deploy.outputs.ecr_repo_name }}" \
+            -var="aws_region=${{ needs.deploy.outputs.aws_region }}" \
+            -var="aws_account_id=${{ needs.deploy.outputs.aws_account_id }}"
         working-directory: modules/ECS
