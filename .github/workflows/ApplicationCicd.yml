@@ -14,7 +14,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: us-east-1
+      AWS_REGION: us-east-1 
       ECR_REPO_NAME: devpython
       IMAGE_TAG: ${{ github.sha }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -23,7 +23,7 @@ jobs:
       image_tag: ${{ env.IMAGE_TAG }}
       ecr_repo_name: ${{ env.ECR_REPO_NAME }}
       aws_region: ${{ env.AWS_REGION }}
-      aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
+      #aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
 
     steps:
       - name: Checkout code
