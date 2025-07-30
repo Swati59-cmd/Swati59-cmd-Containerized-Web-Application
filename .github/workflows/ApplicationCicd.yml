@@ -64,7 +64,6 @@ jobs:
                 -var="aws_account_id=${{ env.AWS_ACCOUNT_ID }}" \
                 -out=tfplan
 
-
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -76,7 +75,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     environment:
-      name: dev  # Must match GitHub Environment name
+      name: dev  # This must exist under GitHub repo → Settings → Environments
 
     steps:
       - name: Checkout code
@@ -109,12 +108,10 @@ jobs:
         working-directory: modules/ECS
 
   destroy:
-    name: Terraform Destroy (Manual Approval)
-    needs: deploy
-    if: github.event.inputs.destroy == 'true'
+    name: Terraform Destroy
     runs-on: ubuntu-latest
-    environment:
-      name: dev  # Must match GitHub Environment
+    if: github.event.inputs.destroy == 'true'
+    needs: deploy
 
     steps:
       - name: Checkout code
@@ -137,10 +134,5 @@ jobs:
         working-directory: modules/ECS
 
       - name: Terraform Destroy
-        run: |
-          terraform destroy -auto-approve \
-            -var="image_tag=${{ needs.deploy.outputs.image_tag }}" \
-            -var="ecr_repo_name=${{ needs.deploy.outputs.ecr_repo_name }}" \
-            -var="aws_region=${{ needs.deploy.outputs.aws_region }}" \
-            -var="aws_account_id=${{ needs.deploy.outputs.aws_account_id }}"
+        run: terraform destroy -auto-approve
         working-directory: modules/ECS
