@@ -36,12 +36,13 @@ jobs:
 
       - name: Terraform Plan
         run: |
+          terraform plan \
           -var="image_tag=${{ env.IMAGE_TAG }}" \
           -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
           -var="environment=${{ env.TF_ENV }}" \
           -out=tfplan
         working-directory: ${{ env.TF_DIR }}
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
-        working-directory: ${{ env.TF_DIR }}
+      #- name: Terraform Apply
+       # run: terraform apply -auto-approve tfplan
+        #working-directory: ${{ env.TF_DIR }}
