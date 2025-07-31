@@ -9,10 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
-      IMAGE_TAG: ${{ github.sha }}
-      TF_ENV: ${{ github.ref_name }}
-      ECR_REPO_NAME: ${{ github.ref_name == 'dev' && 'devpython' || github.ref_name == 'stage' && 'stagepython' || 'prodpython' }}
-      TF_DIR: ${{ github.ref_name == 'dev' && 'modules/DevECS' || github.ref_name == 'stage' && 'modules/StageECS' || 'modules/ProdECS' }}
+      IMAGE_TAG: ${{ github.event.client_payload.image_tag }}
+      TF_ENV: ${{ github.event.client_payload.environment }}
+      ECR_REPO_NAME: ${{ github.event.client_payload.ecr_repo_name }}
+      TF_DIR: ${{ github.event.client_payload.environment == 'dev' && 'modules/DevECS' || github.event.client_payload.environment == 'stage' && 'modules/StageECS' || 'modules/ProdECS' }}
+
 
     steps:
       - name: Checkout Infra Code
