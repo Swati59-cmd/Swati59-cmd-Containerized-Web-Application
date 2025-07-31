@@ -15,6 +15,9 @@ jobs:
       ENVIRONMENT: ${{ github.event.client_payload.environment }}
 
     steps:
+      - name: Print GitHub Event
+        run: echo "${{ toJson(github.event) }}"
+        
       - name: Checkout Infra Code
         uses: actions/checkout@v3
 
