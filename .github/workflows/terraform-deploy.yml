@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Print GitHub Event
         run: echo "${{ toJson(github.event) }}"
-        
+
       - name: Checkout Infra Code
         uses: actions/checkout@v3
 
@@ -40,10 +40,10 @@ jobs:
           -var="aws_region=${{ env.AWS_REGION }}"
         working-directory: modules/DevECS
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve \
-          -var="image_tag=${{ env.IMAGE_TAG }}" \
-          -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-          -var="environment=${{ env.ENVIRONMENT }}" \
-          -var="aws_region=${{ env.AWS_REGION }}"
-        working-directory: modules/DevECS
+      #- name: Terraform Apply
+       # run: terraform apply -auto-approve \
+        #  -var="image_tag=${{ env.IMAGE_TAG }}" \
+         # -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
+          #-var="environment=${{ env.ENVIRONMENT }}" \
+          #-var="aws_region=${{ env.AWS_REGION }}"
+       # working-directory: modules/DevECS
