@@ -37,7 +37,7 @@ jobs:
           terraform plan \
             -var="image_tag=${{ env.IMAGE_TAG }}" \
             -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-            -var="environment=${{ env.TF_ENV }}" \
+            -var="Environment=${{ env.TF_ENV }}" \
             -out=tfplan
         working-directory: ${{ env.TF_DIR }}
 
