@@ -1,4 +1,4 @@
-name: Terraform Deploy on Image Update
+name: Terraform Deploy
 
 on:
   repository_dispatch:
@@ -7,41 +7,40 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     env:
       AWS_REGION: us-east-1
       IMAGE_TAG: ${{ github.event.client_payload.image_tag }}
-      TF_ENV: ${{ github.event.client_payload.environment }}
       ECR_REPO_NAME: ${{ github.event.client_payload.ecr_repo_name }}
-      TF_DIR: ${{ github.event.client_payload.environment == 'dev' && 'modules/DevECS' || github.event.client_payload.environment == 'stage' && 'modules/StageECS' || 'modules/ProdECS' }}
-
+      ENVIRONMENT: ${{ github.event.client_payload.environment }}
 
     steps:
       - name: Checkout Infra Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ env.TF_DIR }}
+        working-directory: modules/DevECS
 
       - name: Terraform Plan
-        run: |
-          terraform plan \
-            -var="image_tag=${{ env.IMAGE_TAG }}" \
-            -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-            -var="Environment=${{ env.TF_ENV }}" \
-            -out=tfplan
-        working-directory: ${{ env.TF_DIR }}
+        run: terraform plan \
+          -var="image_tag=${{ env.IMAGE_TAG }}" \
+          -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
+          -var="environment=${{ env.ENVIRONMENT }}" \
+          -var="aws_region=${{ env.AWS_REGION }}"
+        working-directory: modules/DevECS
 
-      #- name: Terraform Apply
-       # run: terraform apply -auto-approve tfplan
-        #working-directory: ${{ env.TF_DIR }}
+      - name: Terraform Apply
+        run: terraform apply -auto-approve \
+          -var="image_tag=${{ env.IMAGE_TAG }}" \
+          -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
+          -var="environment=${{ env.ENVIRONMENT }}" \
+          -var="aws_region=${{ env.AWS_REGION }}"
+        working-directory: modules/DevECS
