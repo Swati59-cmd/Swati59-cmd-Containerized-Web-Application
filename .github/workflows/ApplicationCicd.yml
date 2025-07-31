@@ -48,6 +48,11 @@ jobs:
         working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: ${{ env.TF_DIR }}
+        run: |
+           terraform destroy -auto-approve 
+           -var="image_tag=${{ env.IMAGE_TAG }}" \
+           -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
+            -var="environment=${{ env.TF_ENV }}"
+            working-directory: ${{ env.TF_DIR }}
+
 
