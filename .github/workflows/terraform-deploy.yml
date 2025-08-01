@@ -3,19 +3,13 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - "*"  # Run on all branches like dev, stage, main
+      - "*"  # All branches (dev, stage, main)
 
 jobs:
-  terraform:
+  plan:
     runs-on: ubuntu-latest
-
-    # This is what enables the manual approval before apply
-    environment:
-      name: ${{ github.ref_name }}  # Matches environment name in GitHub
-
-    permissions:
-      id-token: write
-      contents: read
+    outputs:
+      tfplan-path: tfplan
 
     steps:
       - name: Checkout Repository
@@ -41,6 +35,31 @@ jobs:
         run: terraform plan -out=tfplan
         working-directory: modules/DevECS
 
-      #- name: Terraform Apply - ECS (after approval)
-       # run: terraform apply -auto-approve tfplan
-        #working-directory: modules/DevECS
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}  # Triggers manual approval
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init - ECS
+        run: terraform init
+        working-directory: modules/DevECS
+
+     # - name: Terraform Apply - ECS
+      #  run: terraform apply -auto-approve tfplan
+       # working-directory: modules/DevECS
