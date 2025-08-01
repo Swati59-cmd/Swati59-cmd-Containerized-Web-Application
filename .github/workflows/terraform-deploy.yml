@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - dev
-      - stage
-      - main
+  workflow_dispatch:
+    inputs:
+      destroy:
+        required: true
+        default: "false"
 
 env:
   AWS_REGION: us-east-1
@@ -14,24 +17,18 @@ jobs:
   plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.destroy != 'true' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-
-      - name: Set ENV Directory
-        id: setdir
-        run: |
-          DIR_NAME="${GITHUB_REF_NAME}ECS"
-          echo "DIR_NAME=$DIR_NAME" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -40,42 +37,36 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/${{ env.DIR_NAME }}
+        working-directory: modules/DevECS
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: modules/${{ env.DIR_NAME }}
+        working-directory: modules/DevECS
 
       - name: Upload tfplan Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: modules/${{ env.DIR_NAME }}/tfplan
+          path: modules/DevECS/tfplan
 
   apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
     needs: plan
+    if: ${{ github.event.inputs.destroy != 'true' }}
     environment:
-      name: ${{ github.ref_name }}
+      name: dev
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-
-      - name: Set ENV Directory
-        id: setdir
-        run: |
-          DIR_NAME="${GITHUB_REF_NAME}ECS"
-          echo "DIR_NAME=$DIR_NAME" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -86,12 +77,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: modules/${{ env.DIR_NAME }}
+          path: modules/DevECS
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/${{ env.DIR_NAME }}
+        working-directory: modules/DevECS
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/${{ env.DIR_NAME }}
+        working-directory: modules/DevECS
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: modules/DevECS
