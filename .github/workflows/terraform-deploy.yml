@@ -85,9 +85,10 @@ jobs:
   destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.destroy == 'true' }}
     environment:
       name: dev
-    if: github.event.inputs.destroy == 'true'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
