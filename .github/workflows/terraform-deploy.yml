@@ -87,9 +87,9 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: modules/DevECS
 
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: modules/DevECS
+      #- name: Terraform Destroy
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/DevECS
 
       
 
