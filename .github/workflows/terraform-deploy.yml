@@ -19,6 +19,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set ENV Directory
+        id: setdir
+        run: |
+          DIR_NAME="${GITHUB_REF_NAME}ECS"
+          echo "DIR_NAME=$DIR_NAME" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -33,17 +39,17 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/${{ github.ref_name }}ECS
+        working-directory: modules/${{ env.DIR_NAME }}
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: modules/${{ github.ref_name }}ECS
+        working-directory: modules/${{ env.DIR_NAME }}
 
       - name: Upload tfplan Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: modules/${{ github.ref_name }}ECS/tfplan
+          path: modules/${{ env.DIR_NAME }}/tfplan
 
   apply:
     name: Terraform Apply
@@ -55,6 +61,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set ENV Directory
+        id: setdir
+        run: |
+          DIR_NAME="${GITHUB_REF_NAME}ECS"
+          echo "DIR_NAME=$DIR_NAME" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -72,12 +84,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: modules/${{ github.ref_name }}ECS
+          path: modules/${{ env.DIR_NAME }}
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/${{ github.ref_name }}ECS
+        working-directory: modules/${{ env.DIR_NAME }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/${{ github.ref_name }}ECS
+        working-directory: modules/${{ env.DIR_NAME }}
