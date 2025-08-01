@@ -3,14 +3,15 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - "*"  
+      - "*"  # Run on all branches like dev, stage, main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    # This is what enables the manual approval before apply
     environment:
-      name: ${{ github.ref_name }}  
+      name: ${{ github.ref_name }}  # Matches environment name in GitHub
 
     permissions:
       id-token: write
@@ -32,7 +33,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-
       - name: Terraform Init - ECS
         run: terraform init
         working-directory: modules/DevECS
@@ -43,9 +43,4 @@ jobs:
 
       #- name: Terraform Apply - ECS (after approval)
        # run: terraform apply -auto-approve tfplan
-       # working-directory: modules/DevECS
-
-      # Optional: Destroy step
-      # - name: Destroy Terraform
-      #   run: terraform destroy -auto-approve
-      #   working-directory: modules/ECS
+        #working-directory: modules/DevECS
