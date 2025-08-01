@@ -1,7 +1,14 @@
 name: Terraform Deployment
 
 on:
-  push:
+   workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Set to true to destroy infrastructure'
+        required: false
+        default: 'false'
+
+   push:
     branches:
       - "*"  # All branches (dev, stage, main)
 
@@ -60,6 +67,34 @@ jobs:
         run: terraform init
         working-directory: modules/DevECS
 
-     # - name: Terraform Apply - ECS
-      #  run: terraform apply -auto-approve tfplan
-       # working-directory: modules/DevECS
+      - name: Terraform Apply - ECS
+        run: terraform apply -auto-approve tfplan
+        working-directory: modules/DevECS
+  destroy:
+    if: ${{ github.event.inputs.destroy == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}  # Manual approval required
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init - ECS
+        run: terraform init
+        working-directory: modules/DevECS
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: modules/DevECS    
