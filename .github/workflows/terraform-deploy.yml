@@ -1,49 +1,51 @@
-name: Terraform Deploy
+name: Terraform Deployment
 
 on:
-  repository_dispatch:
-    types: [deploy-dev, deploy-stage, deploy-main]
+  push:
+    branches:
+      - "*"  
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: us-east-1
-      IMAGE_TAG: ${{ github.event.client_payload.image_tag }}
-      ECR_REPO_NAME: ${{ github.event.client_payload.ecr_repo_name }}
-      ENVIRONMENT: ${{ github.event.client_payload.environment }}
+    environment:
+      name: ${{ github.ref_name }}  
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
-      - name: Print GitHub Event
-        run: echo "${{ toJson(github.event) }}"
-
-      - name: Checkout Infra Code
+      - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.0
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
-      - name: Terraform Init
+
+      - name: Terraform Init - ECS
         run: terraform init
         working-directory: modules/DevECS
 
       - name: Terraform Plan
-        run: terraform plan \
-          -var="image_tag=${{ env.IMAGE_TAG }}" \
-          -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-          -var="environment=${{ env.ENVIRONMENT }}" \
-          -var="aws_region=${{ env.AWS_REGION }}"
+        run: terraform plan -out=tfplan
         working-directory: modules/DevECS
 
-      #- name: Terraform Apply
-       # run: terraform apply -auto-approve \
-        #  -var="image_tag=${{ env.IMAGE_TAG }}" \
-         # -var="ecr_repo_name=${{ env.ECR_REPO_NAME }}" \
-          #-var="environment=${{ env.ENVIRONMENT }}" \
-          #-var="aws_region=${{ env.AWS_REGION }}"
+      #- name: Terraform Apply - ECS (after approval)
+       # run: terraform apply -auto-approve tfplan
        # working-directory: modules/DevECS
+
+      # Optional: Destroy step
+      # - name: Destroy Terraform
+      #   run: terraform destroy -auto-approve
+      #   working-directory: modules/ECS
