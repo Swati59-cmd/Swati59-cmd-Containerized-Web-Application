@@ -24,10 +24,10 @@ variable "key_name" {
 
 
 
-variable "image_tag" {
-  description = "Docker image tag for ECS task definition"
-  type        = string
-}
+#variable "image_tag" {
+# description = "Docker image tag for ECS task definition"
+#type        = string
+#}
 
 
 
