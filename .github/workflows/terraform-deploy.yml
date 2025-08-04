@@ -28,7 +28,7 @@ jobs:
     if: ${{ github.event.inputs.destroy != 'true' }}
  
     env:
-      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+      ENV_DIR: modules/${{ github.event.inputs.environment }}/ECS
  
  
     steps:
@@ -70,7 +70,7 @@ jobs:
       name: ${{ github.event.inputs.environment }}
  
     env:
-      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+      ENV_DIR: modules/${{ github.event.inputs.environment }}/ECS
  
  
     steps:
@@ -109,7 +109,7 @@ jobs:
     if: ${{ github.event.inputs.destroy == 'true' }}
  
     env:
-      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+      ENV_DIR: modules/${{ github.event.inputs.environment }}/ECS
  
  
     steps:
