@@ -37,17 +37,17 @@ jobs:
  
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/mainECS
+        working-directory: modules/ECS
  
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: modules/mainECS
+        working-directory: modules/ECS
  
       - name: Upload tfplan Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: modules/mainECS/tfplan
+          path: modules/ECS/tfplan
  
   apply:
     name: Terraform Apply
@@ -77,16 +77,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: modules/mainECS
+          path: modules/ECS
  
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/mainECS
+        working-directory: modules/ECS
  
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/mainECS
+        working-directory: modules/ECS
  
-      #- name: Terraform Destroy
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/DevECS
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: modules/ECS
