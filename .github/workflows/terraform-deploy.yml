@@ -28,7 +28,7 @@ jobs:
     if: ${{ github.event.inputs.destroy != 'true' }}
 
     env:
-      ENV_DIR: Environment/ECS${{ github.event.inputs.environment }}
+      ENV_DIR: Environment/dev/ECS${{ github.event.inputs.environment }}
 
     steps:
       - name: Checkout code
