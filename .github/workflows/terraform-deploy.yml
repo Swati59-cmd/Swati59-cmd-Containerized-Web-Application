@@ -28,7 +28,8 @@ jobs:
     if: ${{ github.event.inputs.destroy != 'true' }}
 
     env:
-      ENV_DIR: Environment/dev/ECS${{ github.event.inputs.environment }}
+      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+
 
     steps:
       - name: Checkout code
@@ -69,7 +70,8 @@ jobs:
       name: ${{ github.event.inputs.environment }}
 
     env:
-      ENV_DIR: Environment/dev/ECS${{ github.event.inputs.environment }}
+      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+
 
     steps:
       - name: Checkout code
@@ -107,7 +109,8 @@ jobs:
     if: ${{ github.event.inputs.destroy == 'true' }}
 
     env:
-      ENV_DIR: environments/${{ github.event.inputs.environment }}
+      ENV_DIR: Environment/${{ github.event.inputs.environment }}/ECS
+
 
     steps:
       - name: Checkout code
