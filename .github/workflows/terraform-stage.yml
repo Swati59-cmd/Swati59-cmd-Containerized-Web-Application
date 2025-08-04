@@ -3,7 +3,7 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - dev
+      - stage
   workflow_dispatch:
     inputs:
      environment:
@@ -43,11 +43,11 @@ jobs:
  
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/DevECS
+        working-directory: modules/StageECS
  
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: modules/DevECS
+        working-directory: modules/StageECS
  
       - name: Upload tfplan Artifact
         uses: actions/upload-artifact@v4
@@ -87,12 +87,12 @@ jobs:
  
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/DevECS
+        working-directory: modules/StageECS
  
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/DevECS
+        working-directory: modules/StageECS
  
-      #- name: Terraform Destroy
-       # run: terraform destroy -auto-approve
-        #working-directory: modules/DevECS
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: modules/StageECS
