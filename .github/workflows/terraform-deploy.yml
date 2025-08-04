@@ -12,22 +12,24 @@ on:
           - stage
           - prod
       destroy:
-        description: "Set to true to destroy"
+        type: boolean
+        description: "Set to true to destroy resources"
         required: false
-        default: "false"
+        default: false
 
 env:
   AWS_REGION: us-east-1
 
 jobs:
   terraform:
-    name: Deploy ${{ github.event.inputs.environment }}
+    name: Terraform ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print selected environment
+      - name: Print selected environment and destroy flag
         run: |
-          echo "Selected environment: ${{ github.event.inputs.environment }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Destroy: ${{ github.event.inputs.destroy }}"
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -58,16 +60,16 @@ jobs:
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Terraform Plan
-        if: ${{ github.event.inputs.destroy != 'true' }}
+        if: ${{ github.event.inputs.destroy == false }}
         run: terraform plan -out=tfplan
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Terraform Apply
-        if: ${{ github.event.inputs.destroy != 'true' }}
+        if: ${{ github.event.inputs.destroy == false }}
         run: terraform apply -auto-approve tfplan
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Terraform Destroy
-        if: ${{ github.event.inputs.destroy == 'true' }}
+        if: ${{ github.event.inputs.destroy == true }}
         run: terraform destroy -auto-approve
         working-directory: ${{ env.ENV_DIR }}
