@@ -6,7 +6,7 @@ on:
       environment:
         description: "Choose environment: dev, stage, prod"
         required: true
-        default: "dev"
+        default: "main"
       destroy:
         description: "Destroy resources (true/false)"
         required: true
@@ -14,8 +14,6 @@ on:
  
   push:
     branches:
-      - dev
-      - stage
       - main
  
 env:
