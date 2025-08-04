@@ -1,5 +1,5 @@
 module "ECSdemo" {
-  source        = "../../Environment/dev/ECS"
+  source        = "../../Environment/ECS"
   environment   = "dev"
   ecr_repo_name = "devpython"
 
