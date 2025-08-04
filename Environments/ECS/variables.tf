@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Environment name[main/stage]"
   type        = string
-  default     = "stage"
+  default     = "main"
 }
 
 variable "ami_id" {
@@ -29,7 +29,7 @@ variable "image_tag" {
 
 variable "ecr_repo_name" {
   type    = string
-  default = "stagepython"
+  default = "mainpython"
 }
 variable "aws_account_id" {
   type    = number
@@ -42,7 +42,7 @@ variable "aws_region" {
 variable "acm_certificate_arn" {
   description = "ARN of the ACM certificate"
   type        = string
-  default     = "arn:aws:acm:us-east-1:851725602228:certificate/84a5d456-bb51-4034-b2ff-414cf3fd5029"
+  default     = "arn:aws:acm:us-east-1:851725602228:certificate/d8eaf053-bb15-4a7f-9e93-5b07ef598e36"
 }
 
 

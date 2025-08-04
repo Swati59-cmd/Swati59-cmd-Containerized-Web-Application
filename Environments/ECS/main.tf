@@ -52,8 +52,7 @@ EOF
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name    = "${var.environment}-ecs-instance"
-      project = "Swati-project"
+      Name = "${var.environment}-ecs-instance"
     }
   }
 }
@@ -64,7 +63,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   min_size            = 2
   max_size            = 4
   desired_capacity    = 2
-  vpc_zone_identifier = module.vpc_stage.private_subnet_ids
+  vpc_zone_identifier = module.vpc_main.private_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
 
@@ -76,11 +75,6 @@ resource "aws_autoscaling_group" "ecs_asg" {
   tag {
     key                 = "Name"
     value               = "${var.environment}-ecs-instance"
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Project"
-    value               = "swati-project"
     propagate_at_launch = true
   }
 }
@@ -137,7 +131,7 @@ resource "aws_ecs_service" "service" {
   desired_count   = 1
   launch_type     = "EC2"
   network_configuration {
-    subnets          = module.vpc_stage.public_subnet_ids
+    subnets          = module.vpc_main.public_subnet_ids
     security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
@@ -155,10 +149,9 @@ data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
 }
 
-
-module "vpc_stage" {
-  source               = "../../../modules/StageVPC"
-  vpc_cidr             = "10.1.0.0/16"
-  public_subnet_cidrs  = ["10.1.10.0/24", "10.1.11.0/24"]
-  private_subnet_cidrs = ["10.1.20.0/24", "10.1.21.0/24"]
+module "vpc_main" {
+  source               = "../../../modules/MainVPC"
+  vpc_cidr             = "10.2.0.0/16"
+  public_subnet_cidrs  = ["10.2.10.0/24", "10.2.11.0/24"]
+  private_subnet_cidrs = ["10.2.20.0/24", "10.2.21.0/24"]
 }
