@@ -1,20 +1,14 @@
 name: Terraform Deployment
  
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: "Choose environment: dev, stage, prod"
-        required: true
-        default: "main"
-      destroy:
-        description: "Destroy resources (true/false)"
-        required: true
-        default: "false"
- 
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      destroy:
+        required: true
+        default: "false"
  
 env:
   AWS_REGION: us-east-1
@@ -25,10 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.destroy != 'true' }}
  
-    env:
-      ENV_DIR: modules/mainECS
- 
- 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,7 +28,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
  
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -47,17 +37,17 @@ jobs:
  
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ env.ENV_DIR }}
+        working-directory: modules/mainECS
  
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: ${{ env.ENV_DIR }}
+        working-directory: modules/mainECS
  
       - name: Upload tfplan Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.ENV_DIR }}/tfplan
+          path: modules/mainECS/tfplan
  
   apply:
     name: Terraform Apply
@@ -65,11 +55,7 @@ jobs:
     needs: plan
     if: ${{ github.event.inputs.destroy != 'true' }}
     environment:
-      name: ${{ github.event.inputs.environment }}
- 
-    env:
-      ENV_DIR: modules/mainECS
- 
+      name: main
  
     steps:
       - name: Checkout code
@@ -80,7 +66,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
  
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -91,46 +77,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.ENV_DIR }}
+          path: modules/mainECS
  
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ env.ENV_DIR }}
+        working-directory: modules/mainECS
  
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: ${{ env.ENV_DIR }}
+        working-directory: modules/mainECS
  
-  destroy:
-    name: Terraform Destroy
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.destroy == 'true' }}
- 
-    env:
-      ENV_DIR: modules/mainECS
- 
- 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
- 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
- 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.7
- 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ${{ env.ENV_DIR }}
- 
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: ${{ env.ENV_DIR }}
- 
+      #- name: Terraform Destroy
+       # run: terraform destroy -auto-approve
+        #working-directory: modules/DevECS
