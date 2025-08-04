@@ -51,7 +51,7 @@ jobs:
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var-file="terraform.tfvars"
+        run: terraform plan -out=tfplan 
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Upload tfplan Artifact
@@ -130,5 +130,5 @@ jobs:
         working-directory: ${{ env.ENV_DIR }}
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve -var-file="terraform.tfvars"
+        run: terraform destroy -auto-approve 
         working-directory: ${{ env.ENV_DIR }}
