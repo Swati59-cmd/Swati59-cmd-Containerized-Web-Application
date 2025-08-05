@@ -88,5 +88,5 @@ jobs:
         working-directory: modules/ECS
  
       #- name: Terraform Destroy
-       # run: terraform destroy -auto-approve
+        #run: terraform destroy -auto-approve
        # working-directory: modules/ECS
