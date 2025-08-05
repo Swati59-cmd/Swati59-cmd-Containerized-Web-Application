@@ -60,9 +60,9 @@ EOF
 
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.environment}-ecs-asg"
-  min_size            = 2
-  max_size            = 4
-  desired_capacity    = 2
+  min_size            = 3
+  max_size            = 6
+  desired_capacity    = 4
   vpc_zone_identifier = module.vpc_main.private_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
@@ -128,7 +128,7 @@ resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 1
+  desired_count   = 2
   launch_type     = "EC2"
   network_configuration {
     subnets          = module.vpc_main.public_subnet_ids
