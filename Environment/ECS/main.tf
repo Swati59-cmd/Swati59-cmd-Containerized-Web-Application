@@ -110,7 +110,7 @@ resource "aws_ecs_task_definition" "task" {
   container_definitions = jsonencode([
     {
       name      = "app"
-      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.ecr_repo_name}:${var.image_tag}"
+      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.ecr_repo_name}"
       essential = true
       portMappings = [
         {
@@ -150,7 +150,7 @@ data "aws_ssm_parameter" "ecs_ami" {
 }
 
 module "vpc_main" {
-  source               = "../../modules/VPC"
+  source               = "../VPC"
   vpc_cidr             = "10.2.0.0/16"
   public_subnet_cidrs  = ["10.2.10.0/24", "10.2.11.0/24"]
   private_subnet_cidrs = ["10.2.20.0/24", "10.2.21.0/24"]
