@@ -20,11 +20,6 @@ resource "aws_iam_role" "ecs_instance_role" {
       Action = "sts:AssumeRole"
     }]
   })
-  tags = {
-    Name        = "${var.environment}-listener"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
@@ -33,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
 }
 
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "${var.environment}-ecs-instanceDemo5"
+  name = "${var.environment}-ecs-instance-profileDemo2"
   role = aws_iam_role.ecs_instance_role.name
 }
 
@@ -42,7 +37,7 @@ resource "aws_launch_template" "ecs" {
   image_id               = data.aws_ssm_parameter.ecs_ami.value
   instance_type          = var.instance_type
   key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.ecs_instance_sg.id]
+  vpc_security_group_ids = [aws_security_group.ecs_sg.id]
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
@@ -57,25 +52,19 @@ EOF
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name        = "${var.environment}-ecs-instance"
-      Environment = var.environment
-      Project     = "swati-project"
+      Name    = "${var.environment}-ecs-instance"
+      project = "Swati-project"
     }
-  }
-  tags = {
-    Name        = "${var.environment}-ecs-launch-template"
-    Environment = var.environment
-    Project     = "swati-project"
   }
 }
 
 
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.environment}-ecs-asg"
-  min_size            = 2
-  max_size            = 4
-  desired_capacity    = 2
-  vpc_zone_identifier = module.vpc.public_subnet_ids
+  min_size            = 3
+  max_size            = 6
+  desired_capacity    = 4
+  vpc_zone_identifier = module.vpc_stage.private_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
 
@@ -90,18 +79,11 @@ resource "aws_autoscaling_group" "ecs_asg" {
     propagate_at_launch = true
   }
   tag {
-    key                 = "Environment"
-    value               = var.environment
-    propagate_at_launch = true
-  }
-
-  tag {
     key                 = "Project"
     value               = "swati-project"
     propagate_at_launch = true
   }
 }
-
 
 
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -117,11 +99,6 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       Action = "sts:AssumeRole"
     }]
   })
-  tags = {
-    Name        = "${var.environment}-ecs-task-execution-role"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
@@ -145,13 +122,10 @@ resource "aws_ecs_task_definition" "task" {
         {
           containerPort = 5000,
           hostPort      = 5000
-
         }
       ]
-
     }
   ])
-
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 }
@@ -160,15 +134,13 @@ resource "aws_ecs_service" "service" {
   name            = "${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 1
+  desired_count   = 2
   launch_type     = "EC2"
   network_configuration {
-    subnets         = module.vpc.public_subnet_ids
-    security_groups = [aws_security_group.ecs_instance_sg.id]
-
-    assign_public_ip = false # or true if needed
+    subnets          = module.vpc_stage.public_subnet_ids
+    security_groups  = [aws_security_group.ecs_sg.id]
+    assign_public_ip = false
   }
-
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
@@ -184,10 +156,9 @@ data "aws_ssm_parameter" "ecs_ami" {
 }
 
 
-module "vpc" {
-  source               = "../VPC"
-  vpc_cidr             = "10.0.0.0/16"
-  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs = ["10.0.101.0/24", "10.0.102.0/24"]
+module "vpc_stage" {
+  source               = "../../modules/VPC"
+  vpc_cidr             = "10.1.0.0/16"
+  public_subnet_cidrs  = ["10.1.10.0/24", "10.1.11.0/24"]
+  private_subnet_cidrs = ["10.1.20.0/24", "10.1.21.0/24"]
 }
-
