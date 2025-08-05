@@ -21,12 +21,6 @@ variable "key_name" {
   type        = string
   default     = "lambda"
 }
-
-variable "image_tag" {
-  description = "Docker image tag for ECS task definition"
-  type        = string
-}
-
 variable "ecr_repo_name" {
   type    = string
   default = "stagepython"
