@@ -1,8 +1,8 @@
 module "ECSdemo" {
-  source        = "../../Environment/ECS"
+  source        = "../../Environments/ECS"
   environment   = "dev"
   ecr_repo_name = "devpython"
-  image_tag     = ""
+
 
 }
 

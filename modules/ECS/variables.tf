@@ -21,10 +21,6 @@ variable "key_name" {
   type        = string
   default     = "lambda"
 }
-
-
-
-
 variable "ecr_repo_name" {
   description = "ECR repository name"
   type        = string
