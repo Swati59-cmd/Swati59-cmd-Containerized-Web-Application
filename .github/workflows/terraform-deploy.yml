@@ -91,6 +91,8 @@ jobs:
     name: Terraform Destroy
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.destroy == 'true' }}
+    environment:
+      name: stage
 
     steps:
       - name: Checkout code
