@@ -40,19 +40,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/dev
+        working-directory: modules/ECS
 
       - name: Terraform Plan
         if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform plan -out=tfplan
-        working-directory: modules/dev
+        working-directory: modules/ECS
 
       - name: Terraform Apply
         if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/dev
+        working-directory: modules/ECS
 
       - name: Terraform Destroy
         if: ${{ github.event.inputs.destroy == 'true' }}
         run: terraform destroy -auto-approve
-        working-directory: modules/dev
+        working-directory: modules/ECS
