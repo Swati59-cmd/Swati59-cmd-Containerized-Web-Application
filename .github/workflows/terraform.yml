@@ -3,7 +3,7 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - main
+      - dev
   workflow_dispatch:
     inputs:
       destroy:
@@ -55,7 +55,7 @@ jobs:
     needs: plan
     if: ${{ github.event.inputs.destroy != 'true' }}
     environment:
-      name: main
+      name: dev
 
     steps:
       - name: Checkout code
