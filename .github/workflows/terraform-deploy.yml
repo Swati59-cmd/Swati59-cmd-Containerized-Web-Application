@@ -1,4 +1,4 @@
-name: Terraform Dev Environment
+name: Terraform Dev Deployment
 
 on:
   workflow_dispatch:
@@ -17,8 +17,8 @@ env:
 
 jobs:
   terraform:
-    name: ${{ github.event.inputs.destroy == 'true' && 'Terraform Destroy' || 'Terraform Apply' }}
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Checkout code
@@ -40,17 +40,17 @@ jobs:
         run: terraform init
         working-directory: modules/dev
 
-      - name: Terraform Plan (only if destroy is false)
+      - name: Terraform Plan
         if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform plan -out=tfplan
-        working-directory: environments/dev
+        working-directory: modules/dev
 
-      - name: Terraform Apply (only if destroy is false)
+      - name: Terraform Apply
         if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform apply -auto-approve tfplan
         working-directory: modules/dev
 
-      - name: Terraform Destroy (only if destroy is true)
+      - name: Terraform Destroy
         if: ${{ github.event.inputs.destroy == 'true' }}
         run: terraform destroy -auto-approve
         working-directory: modules/dev
