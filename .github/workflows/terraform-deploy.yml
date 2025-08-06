@@ -38,7 +38,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: environments/dev
+        working-directory: modules/dev
 
       - name: Terraform Plan (only if destroy is false)
         if: ${{ github.event.inputs.destroy != 'true' }}
@@ -48,9 +48,9 @@ jobs:
       - name: Terraform Apply (only if destroy is false)
         if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform apply -auto-approve tfplan
-        working-directory: environments/dev
+        working-directory: modules/dev
 
       - name: Terraform Destroy (only if destroy is true)
         if: ${{ github.event.inputs.destroy == 'true' }}
         run: terraform destroy -auto-approve
-        working-directory: environments/dev
+        working-directory: modules/dev
