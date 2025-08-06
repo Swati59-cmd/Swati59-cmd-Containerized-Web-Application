@@ -54,8 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: plan
     if: ${{ github.event.inputs.destroy != 'true' }}
-    environment:
-      name: stage
+    
 
     steps:
       - name: Checkout code
