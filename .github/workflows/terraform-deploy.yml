@@ -1,15 +1,10 @@
-name: Terraform Deployment
+name: Terraform Dev Environment
 
 on:
-  push:
-    branches:
-      - dev
-      
-
   workflow_dispatch:
     inputs:
       destroy:
-        description: "Set to true to run terraform destroy"
+        description: "Set to true to destroy infrastructure"
         required: true
         default: "false"
         type: choice
@@ -22,7 +17,7 @@ env:
 
 jobs:
   terraform:
-    name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true' && 'Terraform Destroy' || 'Terraform Apply' }}
+    name: ${{ github.event.inputs.destroy == 'true' && 'Terraform Destroy' || 'Terraform Apply' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -43,19 +38,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: modules/ECS
+        working-directory: environments/dev
 
-      - name: Terraform Plan (on push or if destroy is false)
-        if: ${{ github.event_name == 'push' || github.event.inputs.destroy != 'true' }}
+      - name: Terraform Plan (only if destroy is false)
+        if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform plan -out=tfplan
-        working-directory: modules/ECS
+        working-directory: environments/dev
 
-      - name: Terraform Apply (on push or if destroy is false)
-        if: ${{ github.event_name == 'push' || github.event.inputs.destroy != 'true' }}
+      - name: Terraform Apply (only if destroy is false)
+        if: ${{ github.event.inputs.destroy != 'true' }}
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/ECS
+        working-directory: environments/dev
 
-      - name: Terraform Destroy (only if manual and destroy=true)
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true' }}
+      - name: Terraform Destroy (only if destroy is true)
+        if: ${{ github.event.inputs.destroy == 'true' }}
         run: terraform destroy -auto-approve
-        working-directory: modules/ECS
+        working-directory: environments/dev
