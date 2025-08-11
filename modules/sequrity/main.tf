@@ -2,9 +2,6 @@ resource "aws_security_group" "ecs_instance_sg" {
   name   = "Projectecs-sg1"
   vpc_id = module.vpc.vpc_id
 
-
-
-
   ingress {
     description = "Allow port 5000 for Flask app"
     from_port   = 5000
