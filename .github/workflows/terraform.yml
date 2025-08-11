@@ -1,6 +1,10 @@
 name: Terraform Deployment
 
 on:
+  push:
+    branches:
+      - dev
+      - stage
   workflow_dispatch:
     inputs:
       environment:
