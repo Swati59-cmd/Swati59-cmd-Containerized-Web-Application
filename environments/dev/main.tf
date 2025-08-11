@@ -1,11 +1,11 @@
-module "Alb" {
+module "alb" {
   source              = "../../modules/alb"
   environment         = var.environment
   ami_id              = var.ami_id
   acm_certificate_arn = var.acm_certificate_arn
 }
 
-module "ECS" {
+module "ecs" {
   source         = "../../modules/ecs"
   aws_region     = var.aws_region
   environment    = var.environment
@@ -15,11 +15,11 @@ module "ECS" {
   aws_account_id = var.aws_account_id
 }
 
-module "Sequrity" {
+module "sequrity" {
   source = "../../modules/sequrity"
 }
 
-module "VPC" {
+module "vpc" {
   source               = "../../modules/vpc"
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
