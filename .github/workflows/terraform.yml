@@ -18,7 +18,9 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  TF_ENV_DIR: environments/${{ github.event.inputs.environment }}
+  ENV_NAME: ${{ github.event.inputs.environment || github.ref_name }}
+  TF_ENV_DIR: environments/${{ github.event.inputs.environment || github.ref_name }}
+
 
 jobs:
   plan:
