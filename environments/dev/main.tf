@@ -1,12 +1,12 @@
 module "alb" {
-  source              = "../../modules/alb"
+  source              = "../../modules/ALB"
   environment         = var.environment
   ami_id              = var.ami_id
   acm_certificate_arn = var.acm_certificate_arn
 }
 
 module "ecs" {
-  source         = "../../modules/ecs"
+  source         = "../../modules/ECS"
   aws_region     = var.aws_region
   environment    = var.environment
   key_name       = var.key_name
