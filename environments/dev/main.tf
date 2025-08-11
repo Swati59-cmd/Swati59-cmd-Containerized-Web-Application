@@ -3,10 +3,10 @@ module "Alb" {
   environment         = var.environment
   ami_id              = var.ami_id
   acm_certificate_arn = var.acm_certificate_arn
-
 }
+
 module "ECS" {
-  source         = "../../modules/ecs"
+  source         = "../modules/ecs"
   aws_region     = var.aws_region
   environment    = var.environment
   key_name       = var.key_name
@@ -14,11 +14,13 @@ module "ECS" {
   instance_type  = var.instance_type
   aws_account_id = var.aws_account_id
 }
+
 module "Sequrity" {
-  source = "../../modules/sequrity"
+  source = "../modules/security"
 }
+
 module "VPC" {
-  source               = "../../modules/vpc"
+  source               = "../modules/vpc"
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
