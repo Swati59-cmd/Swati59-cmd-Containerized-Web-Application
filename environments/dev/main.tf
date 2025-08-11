@@ -1,5 +1,5 @@
 module "alb" {
-  source              = "../../modules/ALB"
+  source              = "../../modules/alb"
   environment         = var.environment
   ami_id              = var.ami_id
   acm_certificate_arn = var.acm_certificate_arn
