@@ -197,11 +197,11 @@ module "vpcdemo" {
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 module "albdemo" {
-  source               = "../alb"
-  acm_certificate_arn  = var.acm_certificate_arn
-  ami_id               = var.ami_id
-  environment          = var.environment
-  alb_listener         = var.alb_listener
+  source              = "../alb"
+  acm_certificate_arn = var.acm_certificate_arn
+  ami_id              = var.ami_id
+  environment         = var.environment
+  //alb_listener         = var.alb_listener
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
