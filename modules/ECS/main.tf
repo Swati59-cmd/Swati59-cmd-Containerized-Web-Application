@@ -42,7 +42,7 @@ resource "aws_launch_template" "ecs" {
   image_id               = data.aws_ssm_parameter.ecs_ami.value
   instance_type          = var.instance_type
   key_name               = var.key_name
-  vpc_security_group_ids = module.sequritydemo.ecs_instance_sg_id
+  vpc_security_group_ids = [module.sequritydemo.ecs_instance_sg_id]
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
