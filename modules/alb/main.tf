@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "tg" {
   protocol    = "HTTP"
   target_type = "ip"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpcdemo.vpc_id
   tags = {
     Name        = "${var.environment}"
     Projectname = "swati project"
