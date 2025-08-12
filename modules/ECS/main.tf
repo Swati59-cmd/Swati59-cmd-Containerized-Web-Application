@@ -177,14 +177,17 @@ resource "aws_ecs_service" "service" {
   }
 
 
-  depends_on = var.alb_listener
+  depends_on = [var.alb_listener]
 }
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
 }
 
 module "sequritydemo" {
-  source = "../sequrity"
+  source               = "../sequrity"
+  private_subnet_cidrs = var.private_subnet_cidrs
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  vpc_cidr             = var.vpc_cidr
 
 }
 module "vpcdemo" {
@@ -194,11 +197,14 @@ module "vpcdemo" {
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 module "albdemo" {
-  source              = "../alb"
-  acm_certificate_arn = var.acm_certificate_arn
-  ami_id              = var.ami_id
-  environment         = var.environment
-  alb_listener        = var.alb_listener
+  source               = "../alb"
+  acm_certificate_arn  = var.acm_certificate_arn
+  ami_id               = var.ami_id
+  environment          = var.environment
+  alb_listener         = var.alb_listener
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 
 
 
