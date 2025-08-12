@@ -3,7 +3,7 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = "application"
   subnets            = module.vpcdemo.public_subnet_ids
-  security_groups    = [module.sequritydemo.ecs-alb-sg.id]
+  security_groups    = [module.sequritydemo.ecs-alb-sg]
   tags = {
     Name        = "${var.environment}-alb"
     Projectname = "swati project"
