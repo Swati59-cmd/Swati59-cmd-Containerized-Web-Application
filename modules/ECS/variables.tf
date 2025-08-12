@@ -61,10 +61,7 @@ variable "acm_certificate_arn" {
   type        = string
 
 }
-variable "target_group_arn" {
-  description = "ARN of the ALB Target Group"
-  type        = string
-}
+
 
 
 
