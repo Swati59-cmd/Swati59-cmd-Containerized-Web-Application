@@ -11,6 +11,7 @@ module "alb" {
 
 module "ecs" {
   source               = "../../modules/ECS"
+  target_group_arn     = module.alb.target_group_arn
   aws_region           = var.aws_region
   environment          = var.environment
   key_name             = var.key_name
@@ -23,6 +24,7 @@ module "ecs" {
   ami_id               = var.ami_id
   vpc_cidr             = var.vpc_cidr
   alb_listener         = module.alb.listener_arn
+
 }
 
 module "sequrity" {

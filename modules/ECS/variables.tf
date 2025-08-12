@@ -49,12 +49,21 @@ variable "ami_id" {
 
 }
 variable "alb_listener" {}
+variable "target_group_arn" {
+  description = "ARN of the ALB Target Group"
+  type        = string
+}
+
 
 
 variable "acm_certificate_arn" {
   description = "ARN of the ACM certificate"
   type        = string
 
+}
+variable "target_group_arn" {
+  description = "ARN of the ALB Target Group"
+  type        = string
 }
 
 
