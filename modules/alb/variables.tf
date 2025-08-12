@@ -9,7 +9,7 @@ variable "ami_id" {
   type        = string
 
 }
-variable "alb_listener" {}
+
 
 
 variable "acm_certificate_arn" {
@@ -17,5 +17,18 @@ variable "acm_certificate_arn" {
   type        = string
 
 }
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
 
+variable "public_subnet_cidrs" {
+  description = "List of CIDR blocks for public subnets"
+  type        = list(string)
+}
+
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for private subnets"
+  type        = list(string)
+}
 
