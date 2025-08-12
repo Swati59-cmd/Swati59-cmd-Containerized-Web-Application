@@ -6,7 +6,7 @@ module "alb" {
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
   vpc_cidr             = var.vpc_cidr
-  alb_listener         = var.alb_listener
+
 }
 
 module "ecs" {
@@ -22,6 +22,7 @@ module "ecs" {
   acm_certificate_arn  = var.acm_certificate_arn
   ami_id               = var.ami_id
   vpc_cidr             = var.vpc_cidr
+  alb_listener         = module.alb.listener_arn
 }
 
 module "sequrity" {
