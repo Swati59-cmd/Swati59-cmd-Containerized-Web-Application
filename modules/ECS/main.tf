@@ -75,7 +75,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   min_size            = 3
   max_size            = 6
   desired_capacity    = 4
-  vpc_zone_identifier = module.vpc.public_subnet_ids
+  vpc_zone_identifier = module.vpcdemo.public_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
 
@@ -163,8 +163,8 @@ resource "aws_ecs_service" "service" {
   desired_count   = 2
   launch_type     = "EC2"
   network_configuration {
-    subnets         = module.vpc.public_subnet_ids
-    security_groups = [aws_security_group.ecs_instance_sg.id]
+    subnets         = module.vpcdemo.public_subnet_ids
+    security_groups = module.sequritydemo.ecs_instance_sg_id
 
     assign_public_ip = false # or true if needed
   }
@@ -177,7 +177,7 @@ resource "aws_ecs_service" "service" {
   }
 
 
-  depends_on = [aws_lb_listener.listener]
+  depends_on = var.alb_listener
 }
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
@@ -187,5 +187,19 @@ module "sequritydemo" {
   source = "../sequrity"
 
 }
+module "vpcdemo" {
+  source               = "../VPC"
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+}
+module "albdemo" {
+  source              = "../alb"
+  acm_certificate_arn = var.acm_certificate_arn
+  ami_id              = var.ami_id
+  environment         = var.environment
+  alb_listener        = var.alb_listener
 
 
+
+}

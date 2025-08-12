@@ -1,6 +1,6 @@
 resource "aws_security_group" "ecs_instance_sg" {
   name   = "Projectecs-sg1"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpcdemo.vpc_id
 
   ingress {
     description = "Allow port 5000 for Flask app"
@@ -26,7 +26,7 @@ resource "aws_security_group" "ecs_instance_sg" {
 resource "aws_security_group" "alb_sg" {
   name        = "dev-alb-sg"
   description = "Allow public access to ALB"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = module.vpcdemo.vpc_id
 
 
 
@@ -49,4 +49,10 @@ resource "aws_security_group" "alb_sg" {
   tags = {
     Name = "dev-alb-sg"
   }
+}
+module "vpcdemo" {
+  source               = "../VPC"
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 }

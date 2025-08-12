@@ -9,7 +9,7 @@ variable "ami_id" {
   type        = string
 
 }
-
+variable "alb_listener" {}
 
 
 variable "acm_certificate_arn" {

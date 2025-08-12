@@ -2,8 +2,8 @@ resource "aws_lb" "alb" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = module.vpc.public_subnet_ids
-  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = module.vpcdemo.public_subnet_ids
+  security_groups    = module.sequritydemo.ecs-alb-sg.id
   tags = {
     Name        = "${var.environment}-alb"
     Projectname = "swati project"
@@ -39,4 +39,14 @@ resource "aws_lb_listener" "listener" {
     Name        = "${var.environment}"
     Projectname = "swati project"
   }
+}
+
+module "vpcdemo" {
+  source               = "../VPC"
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+}
+module "sequritydemo" {
+  source = "../sequrity"
 }
