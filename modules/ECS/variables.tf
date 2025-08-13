@@ -62,6 +62,12 @@ variable "acm_certificate_arn" {
 
 }
 
+variable "ecs_instance_sg_id" {
+  type = string
+}
+variable "public_subnet_ids" {
+  type = list(string)
+}
 
 
 

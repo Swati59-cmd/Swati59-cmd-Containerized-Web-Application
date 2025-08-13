@@ -2,8 +2,8 @@ resource "aws_lb" "alb" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = module.vpcdemo.public_subnet_ids
-  security_groups    = [module.sequritydemo.ecs-alb-sg]
+  subnets            = var.public_subnet_ids
+  security_groups    = [var.ecs_alb_sg.id]
   tags = {
     Name        = "${var.environment}-alb"
     Projectname = "swati project"
@@ -41,7 +41,7 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-module "vpcdemo" {
+/*module "vpcdemo" {
   source               = "../VPC"
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
@@ -52,4 +52,4 @@ module "sequritydemo" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-}
+}*/

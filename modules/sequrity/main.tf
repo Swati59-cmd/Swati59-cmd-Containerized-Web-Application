@@ -30,7 +30,7 @@ resource "aws_security_group" "ecs_instance_sg" {
 resource "aws_security_group" "alb_sg" {
   name        = "dev-alb-sg"
   description = "Allow public access to ALB"
-  vpc_id      = module.vpcdemo.vpc_id
+  vpc_id      = data.aws_vpc.default
 
 
 

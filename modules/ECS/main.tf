@@ -42,7 +42,7 @@ resource "aws_launch_template" "ecs" {
   image_id               = data.aws_ssm_parameter.ecs_ami.value
   instance_type          = var.instance_type
   key_name               = var.key_name
-  vpc_security_group_ids = [module.sequritydemo.ecs_instance_sg_id]
+  vpc_security_group_ids = [var.ecs_instance_sg.id]
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
@@ -75,7 +75,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   min_size            = 3
   max_size            = 6
   desired_capacity    = 4
-  vpc_zone_identifier = module.vpcdemo.public_subnet_ids
+  vpc_zone_identifier = var.public_subnet_ids
   health_check_type   = "EC2"
   force_delete        = true
 
@@ -163,8 +163,8 @@ resource "aws_ecs_service" "service" {
   desired_count   = 2
   launch_type     = "EC2"
   network_configuration {
-    subnets         = module.vpcdemo.public_subnet_ids
-    security_groups = module.sequritydemo.ecs_instance_sg_id
+    subnets         = var.public_subnet_ids
+    security_groups = [var.ecs_instance_sg_id]
 
     assign_public_ip = false # or true if needed
   }
@@ -190,7 +190,7 @@ module "sequritydemo" {
   vpc_cidr             = var.vpc_cidr
 
 }
-module "vpcdemo" {
+/*module "vpcdemo" {
   source               = "../VPC"
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
@@ -208,4 +208,4 @@ module "albdemo" {
 
 
 
-}
+}*/
