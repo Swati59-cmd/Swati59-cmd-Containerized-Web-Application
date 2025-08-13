@@ -30,10 +30,10 @@ variable "aws_account_id" {
   type = number
 
 }
-variable "aws_region" {
-  type = string
+//variable "aws_region" {
+//type = string
 
-}
+//}
 //variable "acm_certificate_arn" {
 //  description = "ARN of the ACM certificate"
 //  type        = string
