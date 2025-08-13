@@ -20,7 +20,7 @@ module "securitydemo1" {
 module "albdemo" {
   source            = "../../modules/alb"
   environment       = var.environment
-  alb_sg_ids        = module.securitydemo1.ecs-alb-sg.id
+  alb_sg_ids        = [module.securitydemo1.ecs_alb_sg_id]
   public_subnet_ids = module.vpc.public_subnet_ids
   vpc_id            = module.vpc.vpc_id
 

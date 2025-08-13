@@ -12,3 +12,6 @@ output "target_group_arn" {
 output "alb_listener_arn" {
   value = aws_lb_listener.http.arn
 }
+output "ecs_alb_sg_id" {
+  value = aws_security_group.ecs_alb_sg.id
+}
