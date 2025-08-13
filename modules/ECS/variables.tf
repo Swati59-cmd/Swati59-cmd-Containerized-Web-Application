@@ -1,77 +1,13 @@
-variable "environment" {
-  description = "Environment name"
-  type        = string
-
-}
-variable "instance_type" {
-  description = "EC2 instance type for ECS cluster"
-  type        = string
-
-}
-
-variable "key_name" {
-  description = "EC2 key pair name"
-  type        = string
-
-}
-
-variable "ecr_repo_name" {
-  type = string
-
-}
-variable "aws_account_id" {
-  type = number
-
-}
-variable "aws_region" {
-  type = string
-
-}
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
-  type        = string
-}
-
-variable "public_subnet_cidrs" {
-  description = "List of CIDR blocks for public subnets"
-  type        = list(string)
-}
-
-variable "private_subnet_cidrs" {
-  description = "List of CIDR blocks for private subnets"
-  type        = list(string)
-}
-
-
-variable "ami_id" {
-  description = "AMI ID for ECS EC2 instances"
-  type        = string
-
-}
-variable "alb_listener" {}
-variable "target_group_arn" {
-  description = "ARN of the ALB Target Group"
-  type        = string
-}
-
-
-
-variable "acm_certificate_arn" {
-  description = "ARN of the ACM certificate"
-  type        = string
-
-}
-
-variable "ecs_instance_sg_id" {
-  type = string
-}
-variable "public_subnet_ids" {
-  type = list(string)
-}
-
-
-
-
-
-
-
+variable "environment" {}
+variable "ecr_repo_name" {}
+variable "ami_id" {}
+variable "instance_type" {}
+variable "key_name" {}
+variable "ecs_sg_ids" { type = list(string) }
+variable "private_subnet_ids" { type = list(string) }
+variable "desired_capacity" { default = 2 }
+variable "max_size" { default = 3 }
+variable "min_size" { default = 1 }
+variable "service_desired_count" { default = 2 }
+variable "target_group_arn" {}
+variable "alb_listener_arn" {}

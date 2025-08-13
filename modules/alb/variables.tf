@@ -1,40 +1,19 @@
 variable "environment" {
-  description = "Environment name"
   type        = string
-
+  description = "Environment name (dev, stage, prod)"
 }
 
-variable "ami_id" {
-  description = "AMI ID for ECS EC2 instances"
-  type        = string
-
-}
-
-
-
-variable "acm_certificate_arn" {
-  description = "ARN of the ACM certificate"
-  type        = string
-
-}
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
-  type        = string
-}
-
-variable "public_subnet_cidrs" {
-  description = "List of CIDR blocks for public subnets"
+variable "alb_sg_ids" {
   type        = list(string)
+  description = "List of Security Group IDs for ALB"
 }
 
-variable "private_subnet_cidrs" {
-  description = "List of CIDR blocks for private subnets"
-  type        = list(string)
-}
 variable "public_subnet_ids" {
-  type = list(string)
+  type        = list(string)
+  description = "List of Public Subnet IDs for ALB placement"
 }
 
-variable "ecs_alb_sg" {
-  type = string
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID for Target Group"
 }

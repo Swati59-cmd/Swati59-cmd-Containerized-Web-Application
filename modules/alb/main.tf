@@ -1,55 +1,57 @@
-resource "aws_lb" "alb" {
+############################################
+# Application Load Balancer Module
+############################################
+
+resource "aws_lb" "this" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = var.public_subnet_ids
-  security_groups    = [var.ecs_alb_sg.id]
+  security_groups    = var.alb_sg_ids        # Passed dynamically from root/module
+  subnets            = var.public_subnet_ids # Passed dynamically from VPC module
+  idle_timeout       = 60
+
   tags = {
     Name        = "${var.environment}-alb"
-    Projectname = "swati project"
+    Environment = var.environment
+    Project     = "swati-project"
   }
-
 }
 
-resource "aws_lb_target_group" "tg" {
-  name        = "${var.environment}-tg"
+############################################
+# Target Group
+############################################
+resource "aws_lb_target_group" "ecs_tg" {
+  name        = "${var.environment}-ecs-tg"
   port        = 80
   protocol    = "HTTP"
-  target_type = "ip"
+  target_type = "instance" # Since we are using ECS EC2, not Fargate
+  vpc_id      = var.vpc_id # Passed from VPC module output
 
-  vpc_id = module.vpcdemo.vpc_id
-  tags = {
-    Name        = "${var.environment}"
-    Projectname = "swati project"
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-399"
   }
 
+  tags = {
+    Name        = "${var.environment}-ecs-tg"
+    Environment = var.environment
+  }
 }
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.acm_certificate_arn
+############################################
+# Listener (HTTP)
+############################################
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 80
+  protocol          = "HTTP"
+
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
-  }
-  tags = {
-    Name        = "${var.environment}"
-    Projectname = "swati project"
+    target_group_arn = aws_lb_target_group.ecs_tg.arn
   }
 }
-
-/*module "vpcdemo" {
-  source               = "../VPC"
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-}
-module "sequritydemo" {
-  source               = "../sequrity"
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-}*/

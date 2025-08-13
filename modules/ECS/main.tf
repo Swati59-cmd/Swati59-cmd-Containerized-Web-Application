@@ -1,83 +1,75 @@
-resource "aws_ecs_cluster" "main" {
+###########################################
+# ECS Cluster
+###########################################
+resource "aws_ecs_cluster" "this" {
   name = "${var.environment}-ecs-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
   tags = {
-    Name        = "${var.environment}-listener"
+    Name        = "${var.environment}-ecs-cluster"
     Environment = var.environment
-    Project     = "swati-project"
   }
 }
 
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "${var.environment}-ecs-instance-role"
+###########################################
+# IAM Role for ECS Tasks
+###########################################
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "${var.environment}-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole",
+      Principal = { Service = "ecs-tasks.amazonaws.com" },
+      Effect    = "Allow"
     }]
   })
-  tags = {
-    Name        = "${var.environment}-listener"
-    Environment = var.environment
-    Project     = "swati-project"
-  }
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_instance_role_attach" {
-  role       = aws_iam_role.ecs_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_attach" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "${var.environment}-ecs-instanceDemo5"
-  role = aws_iam_role.ecs_instance_role.name
-}
-
+###########################################
+# Launch Template for ECS EC2
+###########################################
 resource "aws_launch_template" "ecs" {
-  name_prefix            = "${var.environment}-ecs-launch-"
-  image_id               = data.aws_ssm_parameter.ecs_ami.value
-  instance_type          = var.instance_type
-  key_name               = var.key_name
-  vpc_security_group_ids = [var.ecs_instance_sg.id]
+  name_prefix   = "${var.environment}-ecs-lt"
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ecs_instance_profile.name
+  network_interfaces {
+    security_groups             = var.ecs_sg_ids
+    associate_public_ip_address = false
   }
 
   user_data = base64encode(<<EOF
 #!/bin/bash
-echo ECS_CLUSTER=${aws_ecs_cluster.main.name} >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=${var.environment}-ecs-cluster >> /etc/ecs/ecs.config
 EOF
   )
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name        = "${var.environment}-ecs-instance"
-      Environment = var.environment
-      Project     = "swati-project"
-    }
-  }
   tags = {
-    Name        = "${var.environment}-ecs-launch-template"
+    Name        = "${var.environment}-ecs-instance"
     Environment = var.environment
-    Project     = "swati-project"
   }
 }
 
-
-resource "aws_autoscaling_group" "ecs_asg" {
-  name                = "${var.environment}-ecs-asg"
-  min_size            = 3
-  max_size            = 6
-  desired_capacity    = 4
-  vpc_zone_identifier = var.public_subnet_ids
-  health_check_type   = "EC2"
-  force_delete        = true
+###########################################
+# Auto Scaling Group for ECS Instances
+###########################################
+resource "aws_autoscaling_group" "ecs" {
+  desired_capacity    = var.desired_capacity
+  max_size            = var.max_size
+  min_size            = var.min_size
+  vpc_zone_identifier = var.private_subnet_ids
 
   launch_template {
     id      = aws_launch_template.ecs.id
@@ -89,123 +81,78 @@ resource "aws_autoscaling_group" "ecs_asg" {
     value               = "${var.environment}-ecs-instance"
     propagate_at_launch = true
   }
-  tag {
-    key                 = "Environment"
-    value               = var.environment
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Project"
-    value               = "swati-project"
-    propagate_at_launch = true
-  }
 }
 
+###########################################
+# Capacity Provider
+###########################################
+resource "aws_ecs_capacity_provider" "ecs_cp" {
+  name = "${var.environment}-ecs-cp"
 
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.ecs.arn
+    managed_termination_protection = "ENABLED"
 
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.environment}-ecs-task-execution-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }]
-  })
-  tags = {
-    Name        = "${var.environment}-ecs-task-execution-role"
-    Environment = var.environment
-    Project     = "swati-project"
+    managed_scaling {
+      status                    = "ENABLED"
+      target_capacity           = 80
+      minimum_scaling_step_size = 1
+      maximum_scaling_step_size = 2
+    }
   }
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_exec_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+resource "aws_ecs_cluster_capacity_providers" "ecs_cp_attach" {
+  cluster_name       = aws_ecs_cluster.this.name
+  capacity_providers = [aws_ecs_capacity_provider.ecs_cp.name]
 }
 
-resource "aws_ecs_task_definition" "task" {
-  family                   = "${var.environment}-app"
+###########################################
+# ECS Task Definition
+###########################################
+resource "aws_ecs_task_definition" "this" {
+  family                   = "${var.environment}-task"
+  network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
-  cpu                      = "128"
-  memory                   = "256"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
 
   container_definitions = jsonencode([
     {
-      name      = "app"
-      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.ecr_repo_name}"
+      name      = "${var.environment}-container"
+      image     = var.ecr_repo_name
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
-          containerPort = 5000,
-          hostPort      = 5000
-
+          containerPort = 80
+          hostPort      = 80
         }
       ]
-
     }
   ])
-
-
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 }
 
-resource "aws_ecs_service" "service" {
-  name            = "${var.environment}-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 2
+###########################################
+# ECS Service
+###########################################
+resource "aws_ecs_service" "this" {
+  name            = "${var.environment}-ecs-service"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.this.arn
+  desired_count   = var.service_desired_count
   launch_type     = "EC2"
-  network_configuration {
-    subnets         = var.public_subnet_ids
-    security_groups = [var.ecs_instance_sg_id]
-
-    assign_public_ip = false # or true if needed
-  }
-
 
   load_balancer {
     target_group_arn = var.target_group_arn
-    container_name   = "app"
-    container_port   = 5000
+    container_name   = "${var.environment}-container"
+    container_port   = 80
   }
 
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 200
 
-  depends_on = [var.alb_listener]
+  depends_on = [var.alb_listener_arn]
 }
-data "aws_ssm_parameter" "ecs_ami" {
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
-}
-
-module "sequritydemo" {
-  source               = "../sequrity"
-  private_subnet_cidrs = var.private_subnet_cidrs
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  vpc_cidr             = var.vpc_cidr
-
-}
-/*module "vpcdemo" {
-  source               = "../VPC"
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-}
-module "albdemo" {
-  source              = "../alb"
-  acm_certificate_arn = var.acm_certificate_arn
-  ami_id              = var.ami_id
-  environment         = var.environment
-  //alb_listener         = var.alb_listener
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-
-
-
-}*/
