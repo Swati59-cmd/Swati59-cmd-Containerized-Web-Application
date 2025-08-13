@@ -10,8 +10,11 @@ module "vpcdemo" {
 
 # Security Groups Module
 module "securitydemo" {
-  source = "../../modules/security"
-  vpc_id = module.vpcdemo.vpc_id
+  source = "../../modules/sequrity"
+  //vpc_id = module.vpcdemo.vpc_id
+  public_subnet_cidrs  = module.vpcdemo.public_subnet_ids
+  private_subnet_cidrs = module.vpcdemo.private_subnet_ids
+  vpc_cidr             = module.vpcdemo.vpc_cidr
 }
 
 # ALB Module
