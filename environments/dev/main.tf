@@ -13,7 +13,7 @@ module "vpc" {
 module "securitydemo1" {
   source      = "../../modules/sequrity"
   environment = var.environment
-  vpc_id      = modules.vpc.vpc_id
+  vpc_id      = module.vpc.vpc_id
 }
 
 # Create ALB
