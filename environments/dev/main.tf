@@ -23,6 +23,7 @@ module "albdemo" {
   alb_sg_ids        = module.securitydemo1.ecs-alb-sg.id
   public_subnet_ids = module.vpc.public_subnet_ids
   vpc_id            = module.vpc.vpc_id
+
 }
 
 module "ecs" {
