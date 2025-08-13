@@ -26,14 +26,21 @@ module "albdemo" {
 }
 
 module "ecs" {
-  source             = "../../modules/ECS"
-  environment        = var.environment
-  ecr_repo_name      = var.ecr_repo_name
-  ami_id             = var.ami_id
-  instance_type      = var.instance_type
-  key_name           = var.key_name
-  ecs_sg_ids         = modules.security.alb_sg_id
-  private_subnet_ids = var.private_subnet_cidrs
-  target_group_arn   = module.albdemo.target_group_arn
+  source               = "../../modules/ECS"
+  environment          = var.environment
+  ecr_repo_name        = var.ecr_repo_name
+  ami_id               = var.ami_id
+  instance_type        = var.instance_type
+  key_name             = var.key_name
+  ecs_sg_ids           = modules.security.alb_sg_id
+  private_subnet_ids   = var.private_subnet_cidrs
+  target_group_arn     = module.albdemo.target_group_arn
+  aws_region           = var.aws_region
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+  awsaws_account_id    = var.aws_account_id
+
+
 
 }
