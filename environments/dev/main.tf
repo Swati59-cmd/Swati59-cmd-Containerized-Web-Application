@@ -20,9 +20,9 @@ module "securitydemo1" {
 module "albdemo" {
   source            = "../../modules/alb"
   environment       = var.environment
-  alb_sg_ids        = [module.securitydemo.alb_sg_id]
-  public_subnet_ids = module.vpcdemo.public_subnet_ids
-  vpc_id            = module.vpcdemo.vpc_id
+  alb_sg_ids        = module.securitydemo1.ecs-alb-sg.id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  vpc_id            = module.vpc.vpc_id
 }
 
 module "ecs" {
@@ -33,7 +33,7 @@ module "ecs" {
   instance_type      = var.instance_type
   key_name           = var.key_name
   ecs_sg_ids         = modules.security.alb_sg_id
-  private_subnet_ids = modules.VPC.public_subnet_ids
-  target_group_arn   = modules.alb.target_group_arn
-  alb_listener_arn   = modules.alb.alb_arn
+  private_subnet_ids = var.private_subnet_cidrs
+  target_group_arn   = module.albdemo.target_group_arn
+
 }
