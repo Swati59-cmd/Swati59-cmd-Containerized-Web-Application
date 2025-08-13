@@ -34,8 +34,8 @@ module "ecs" {
   instance_type = var.instance_type
   key_name      = var.key_name
 
-  ecs_sg_ids         = [module.securitydemo1.ecs-alb-sg] # from security module output
-  private_subnet_ids = module.vpc.private_subnet_ids     # from vpc module output
+  ecs_sg_ids         = [module.securitydemo1.ecs_alb_sg_id] # from security module output
+  private_subnet_ids = module.vpc.private_subnet_ids        # from vpc module output
   target_group_arn   = module.albdemo.target_group_arn
 
   desired_capacity      = 2

@@ -1,6 +1,6 @@
 
 
-resource "aws_security_group" "ecs_instance_sg" {
+resource "aws_security_group" "ecs_service_sg" {
   name   = "Projectecs-sg1"
   vpc_id = var.vpc_id
 
@@ -25,7 +25,7 @@ resource "aws_security_group" "ecs_instance_sg" {
     Project = "swati-project"
   }
 }
-resource "aws_security_group" "alb_sg" {
+resource "aws_security_group" "ecs_alb_sg" {
   name        = "dev-alb-sg"
   description = "Allow public access to ALB"
   vpc_id      = var.vpc_id
