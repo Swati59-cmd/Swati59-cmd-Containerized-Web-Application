@@ -1,10 +1,8 @@
-data "aws_vpc" "default" {
-  default = true
-}
+
 
 resource "aws_security_group" "ecs_instance_sg" {
   name   = "Projectecs-sg1"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = var.vpc_id
 
   ingress {
     description = "Allow port 5000 for Flask app"
@@ -30,7 +28,7 @@ resource "aws_security_group" "ecs_instance_sg" {
 resource "aws_security_group" "alb_sg" {
   name        = "dev-alb-sg"
   description = "Allow public access to ALB"
-  vpc_id      = data.aws_vpc.default
+  vpc_id      = var.vpc_id
 
 
 
