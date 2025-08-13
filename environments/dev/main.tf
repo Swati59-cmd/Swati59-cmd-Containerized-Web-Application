@@ -1,4 +1,4 @@
-module "alb" {
+/*module "alb" {
   source               = "../../modules/alb"
   environment          = var.environment
   ami_id               = var.ami_id
@@ -7,7 +7,7 @@ module "alb" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   vpc_cidr             = var.vpc_cidr
 
-}
+}*/
 
 module "ecs" {
   source               = "../../modules/ECS"
@@ -27,7 +27,7 @@ module "ecs" {
 
 }
 
-module "sequrity" {
+/*module "sequrity" {
   source               = "../../modules/sequrity"
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
@@ -39,4 +39,4 @@ module "vpc" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-}
+}*/
