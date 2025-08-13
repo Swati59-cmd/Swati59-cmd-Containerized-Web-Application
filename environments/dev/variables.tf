@@ -57,9 +57,7 @@ variable "private_subnet_cidrs" {
 variable "public_subnet_ids" {
   type = list(string)
 }
-variable "ecs_alb_sg" {
-  type = string
-}
+
 
 
 
