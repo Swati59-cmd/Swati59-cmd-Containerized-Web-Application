@@ -10,8 +10,8 @@ module "vpc" {
 }
 
 # Create Security Groups
-module "security" {
-  source      = "../../modules/security"
+module "securitydemo1" {
+  source      = "../../modules/sequrity"
   environment = var.environment
   vpc_id      = modules.VPC.vpc_id
 }
