@@ -1,4 +1,4 @@
-/*module "alb" {
+module "alb" {
   source               = "../../modules/alb"
   environment          = var.environment
   ami_id               = var.ami_id
@@ -7,7 +7,7 @@
   public_subnet_cidrs  = var.public_subnet_cidrs
   vpc_cidr             = var.vpc_cidr
 
-}*/
+}
 
 module "ecs" {
   source               = "../../modules/ECS"
