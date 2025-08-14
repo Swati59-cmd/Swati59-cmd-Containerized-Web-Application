@@ -11,3 +11,4 @@ variable "min_size" { default = 1 }
 variable "service_desired_count" { default = 2 }
 variable "target_group_arn" {}
 variable "alb_listener_arn" {}
+variable "instance_type" {}

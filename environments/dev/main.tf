@@ -38,9 +38,9 @@ module "ecs" {
   private_subnet_ids = module.vpc.private_subnet_ids        # from vpc module output
   target_group_arn   = module.albdemo.target_group_arn
 
-  desired_capacity      = 2
-  max_size              = 3
-  min_size              = 1
-  service_desired_count = 2
-  alb_listener_arn      = module.albdemo.alb_listener_arn
+  //desired_capacity      = 2
+  //max_size              = 3
+  //min_size              = 1
+  //service_desired_count = 2
+  alb_listener_arn = module.albdemo.alb_listener_arn
 }
