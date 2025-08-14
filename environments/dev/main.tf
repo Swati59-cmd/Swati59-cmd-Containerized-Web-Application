@@ -5,7 +5,7 @@ module "vpc" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-  availability_zones   = ["ap-south-1a", "ap-south-1b"]
+  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"]
 
 }
 
