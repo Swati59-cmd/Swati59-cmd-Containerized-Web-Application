@@ -26,7 +26,7 @@ module "albdemo" {
 
 }
 
-data "aws_caller_identity" "current" {}
+
 
 module "ecs" {
   source = "../../modules/ECS"
@@ -42,6 +42,6 @@ module "ecs" {
   alb_listener_arn   = module.albdemo.alb_listener_arn
 
   aws_region     = var.aws_region
-  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_account_id = var.aws_account_id
 }
 
