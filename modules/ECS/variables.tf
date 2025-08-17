@@ -21,4 +21,8 @@ variable "min_size" { default = 1 }
 variable "service_desired_count" { default = 2 }
 variable "target_group_arn" {}
 variable "alb_listener_arn" {}
+variable "ecs_sg_ids" {
+  description = "List of security group IDs for ECS instances"
+  type        = list(string)
+}
 

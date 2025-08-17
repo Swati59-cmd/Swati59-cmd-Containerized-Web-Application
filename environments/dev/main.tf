@@ -36,12 +36,12 @@ module "ecs" {
   ami_id             = var.ami_id
   instance_type      = var.instance_type
   key_name           = var.key_name
-  ecs_sg_ids         = [module.securitydemo1.ecs_alb_sg_id]
+  ecs_sg_ids         = [module.securitydemo1.ecs_service_sg_id]
   private_subnet_ids = module.vpc.private_subnet_ids
   target_group_arn   = module.albdemo.target_group_arn
   alb_listener_arn   = module.albdemo.alb_listener_arn
+  aws_region         = var.aws_region
+  aws_account_id     = var.aws_account_id
 
-  aws_region     = var.aws_region
-  aws_account_id = var.aws_account_id
 }
 
