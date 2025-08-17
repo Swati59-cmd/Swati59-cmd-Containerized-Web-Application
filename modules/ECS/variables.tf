@@ -13,7 +13,7 @@ variable "ecr_repo_name" {}
 variable "ami_id" {}
 variable "instance_type" {}
 variable "key_name" {}
-variable "ecs_sg_ids" { type = list(string) }
+
 //variable "private_subnet_ids" { type = list(string) }
 variable "desired_capacity" { default = 2 }
 variable "max_size" { default = 3 }
