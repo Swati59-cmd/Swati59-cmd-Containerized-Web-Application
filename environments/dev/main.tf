@@ -27,20 +27,22 @@ module "albdemo" {
 }
 
 module "ecs" {
-  source        = "../../modules/ECS"
-  environment   = var.environment
-  ecr_repo_name = var.ecr_repo_name
-  ami_id        = var.ami_id
-  instance_type = var.instance_type
-  key_name      = var.key_name
+  source = "../../modules/ECS"
 
-  ecs_sg_ids         = [module.securitydemo1.ecs_alb_sg_id] 
-  private_subnet_ids = module.vpc.private_subnet_ids        
+  environment        = var.environment
+  ecr_repo_name      = var.ecr_repo_name
+  ami_id             = var.ami_id
+  instance_type      = var.instance_type
+  key_name           = var.key_name
+  ecs_sg_ids         = [module.securitydemo1.ecs_alb_sg_id]
+  private_subnet_ids = module.vpc.private_subnet_ids
   target_group_arn   = module.albdemo.target_group_arn
+
 
   //desired_capacity      = 2
   //max_size              = 3
   //min_size              = 1
   //service_desired_count = 2
   alb_listener_arn = module.albdemo.alb_listener_arn
+
 }
