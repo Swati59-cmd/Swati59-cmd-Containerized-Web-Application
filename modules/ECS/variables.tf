@@ -14,7 +14,7 @@ variable "ami_id" {}
 variable "instance_type" {}
 variable "key_name" {}
 variable "ecs_sg_ids" { type = list(string) }
-variable "private_subnet_ids" { type = list(string) }
+//variable "private_subnet_ids" { type = list(string) }
 variable "desired_capacity" { default = 2 }
 variable "max_size" { default = 3 }
 variable "min_size" { default = 1 }
@@ -26,3 +26,7 @@ variable "ecs_sg_ids" {
   type        = list(string)
 }
 
+variable "public_subnet_ids" {
+  description = "Subnets for the ECS service"
+  type        = list(string)
+}

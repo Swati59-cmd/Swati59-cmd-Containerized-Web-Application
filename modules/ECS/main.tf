@@ -37,7 +37,7 @@ resource "aws_launch_template" "ecs" {
   image_id               = data.aws_ssm_parameter.ecs_ami.value
   instance_type          = var.instance_type
   key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.ecs_sg.id]
+  vpc_security_group_ids = var.ecs_sg_ids
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
@@ -131,7 +131,7 @@ resource "aws_ecs_service" "service" {
   desired_count   = 2
   launch_type     = "EC2"
   network_configuration {
-    subnets          = module.vpc_main.public_subnet_ids
+    subnets          = var.public_subnet_ids
     security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
