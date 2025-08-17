@@ -26,6 +26,8 @@ module "albdemo" {
 
 }
 
+data "aws_caller_identity" "current" {}
+
 module "ecs" {
   source = "../../modules/ECS"
 
@@ -37,12 +39,9 @@ module "ecs" {
   ecs_sg_ids         = [module.securitydemo1.ecs_alb_sg_id]
   private_subnet_ids = module.vpc.private_subnet_ids
   target_group_arn   = module.albdemo.target_group_arn
+  alb_listener_arn   = module.albdemo.alb_listener_arn
 
-
-  //desired_capacity      = 2
-  //max_size              = 3
-  //min_size              = 1
-  //service_desired_count = 2
-  alb_listener_arn = module.albdemo.alb_listener_arn
-
+  aws_region     = var.aws_region
+  aws_account_id = data.aws_caller_identity.current.account_id
 }
+

@@ -1,4 +1,14 @@
 variable "environment" {}
+variable "aws_region" {
+  description = "AWS region where resources are deployed"
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "AWS account ID"
+  type        = string
+}
+
 variable "ecr_repo_name" {}
 variable "ami_id" {}
 variable "instance_type" {}
@@ -12,5 +22,3 @@ variable "service_desired_count" { default = 2 }
 variable "target_group_arn" {}
 variable "alb_listener_arn" {}
 
-variable "aws_account_id" {}
-variable "aws_region" {}
