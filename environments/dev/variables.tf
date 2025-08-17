@@ -30,8 +30,8 @@ variable "aws_region" {
   type    = string
   default = "us-east-1" # adjust to your actual region
 }
-variable "account_id" {
-  type = number
+variable "aws_account_id" {
+  type = string
 }
 //variable "acm_certificate_arn" {
 //  description = "ARN of the ACM certificate"
