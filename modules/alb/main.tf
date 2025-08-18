@@ -24,8 +24,8 @@ resource "aws_lb_target_group" "ecs_tg" {
   name        = "${var.environment}-ecs-tg"
   port        = 80
   protocol    = "HTTP"
-  target_type = "ip"       # Since we are using ECS EC2, not Fargate
-  vpc_id      = var.vpc_id # Passed from VPC module output
+  target_type = "ip"
+  vpc_id      = var.vpc_id
 
   health_check {
     path                = "/"
