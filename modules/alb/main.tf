@@ -48,10 +48,16 @@ resource "aws_lb_target_group" "ecs_tg" {
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
-  protocol          = "HTTP"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.acm_certificate_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ecs_tg.arn
   }
+}
+resource "aws_acm_certificate" "cert" {
+  domain_name       = "*.visiontechguru.in"
+  validation_method = "DNS"
 }
