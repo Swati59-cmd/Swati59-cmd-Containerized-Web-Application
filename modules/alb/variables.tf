@@ -17,3 +17,6 @@ variable "vpc_id" {
   type        = string
   description = "VPC ID for Target Group"
 }
+variable "acm_certificate_arn" {
+  type = string
+}
