@@ -41,6 +41,10 @@ resource "aws_lb_target_group" "ecs_tg" {
     Environment = var.environment
   }
 }
+resource "aws_acm_certificate" "cert" {
+  domain_name       = "*.visiontechguru.in"
+  validation_method = "DNS"
+}
 
 ############################################
 # Listener (HTTP)
@@ -57,7 +61,4 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
   }
 }
-resource "aws_acm_certificate" "cert" {
-  domain_name       = "*.visiontechguru.in"
-  validation_method = "DNS"
-}
+
