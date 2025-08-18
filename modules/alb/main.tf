@@ -59,3 +59,10 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+data "aws_acm_certificate" "this" {
+  domain      = var.alb_domain
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
+

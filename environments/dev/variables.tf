@@ -52,7 +52,9 @@ variable "private_subnet_cidrs" {
 variable "acm_certificate_arn" {
   type = string
 }
-
+variable "alb_domain" {
+  type = string
+}
 
 
 
