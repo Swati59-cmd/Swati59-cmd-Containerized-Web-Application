@@ -12,6 +12,6 @@ output "target_group_arn" {
 output "alb_listener_arn" {
   value = aws_lb_listener.http.arn
 }
-output "acm_certificate_arn" {
-  value = aws_acm_certificate.cert.arn
-}
+//output "acm_certificate_arn" {
+//value = aws_acm_certificate.cert.arn
+//}
