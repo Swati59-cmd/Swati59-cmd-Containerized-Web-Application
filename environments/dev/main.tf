@@ -24,6 +24,7 @@ module "albdemo" {
   public_subnet_ids   = module.vpc.public_subnet_ids
   vpc_id              = module.vpc.vpc_id
   acm_certificate_arn = var.acm_certificate_arn
+  alb_domain          = var.alb_domain
 
 
 }
