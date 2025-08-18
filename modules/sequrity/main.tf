@@ -4,6 +4,16 @@ resource "aws_security_group" "ecs_service_sg" {
   name   = "Projectecs-sg1"
   vpc_id = var.vpc_id
 
+
+  ingress {
+    description = "Allow HTTPS from ALB"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    //security_groups = [aws_security_group.alb_sg.id]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   ingress {
     description = "Allow port 5000 for Flask app"
     from_port   = 5000
