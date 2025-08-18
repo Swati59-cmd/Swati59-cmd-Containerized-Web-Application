@@ -33,11 +33,11 @@ variable "aws_region" {
 variable "aws_account_id" {
   type = string
 }
-//variable "acm_certificate_arn" {
-//  description = "ARN of the ACM certificate"
-//  type        = string
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate"
+  type        = string
 
-//}
+}
 
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
