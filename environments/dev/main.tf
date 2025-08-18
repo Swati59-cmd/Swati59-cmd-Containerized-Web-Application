@@ -36,7 +36,7 @@ module "ecs" {
   ami_id            = var.ami_id
   instance_type     = var.instance_type
   key_name          = var.key_name
-  ecs_service_sg_id = [module.securitydemo1.ecs_service_sg_id]
+  ecs_sg_ids        = [module.securitydemo1.ecs_sg_ids]
   public_subnet_ids = [module.vpc.public_subnet_ids]
   target_group_arn  = module.albdemo.target_group_arn
   alb_listener_arn  = module.albdemo.alb_listener_arn
