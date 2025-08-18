@@ -42,7 +42,7 @@ module "ecs" {
   alb_listener_arn  = module.albdemo.alb_listener_arn
   aws_region        = var.aws_region
   aws_account_id    = var.aws_account_id
-
+  depends_on        = [module.albdemo]
 
 
 }
