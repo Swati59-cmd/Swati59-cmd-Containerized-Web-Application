@@ -47,6 +47,7 @@ module "ecs" {
   aws_region         = var.aws_region
   aws_account_id     = var.aws_account_id
   depends_on         = [module.albdemo]
+  public_subnet_ids  = module.vpc.public_subnet_ids
 
 
 
