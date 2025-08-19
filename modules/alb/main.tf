@@ -16,7 +16,7 @@ resource "aws_lb" "this" {
 
 resource "aws_lb_target_group" "ecs_tg" {
   name        = "${var.environment}-ecs-tg"
-  port        = 5000
+  port        = 80
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id
@@ -39,10 +39,10 @@ resource "aws_lb_target_group" "ecs_tg" {
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:us-east-1:851725602228:certificate/cb556548-3b63-4ca3-b5ae-9f6a1ab4dbdd"
+  port              = 80
+  protocol          = "HTTP"
+  //ssl_policy        = "ELBSecurityPolicy-2016-08"
+  //certificate_arn   = "arn:aws:acm:us-east-1:851725602228:certificate/cb556548-3b63-4ca3-b5ae-9f6a1ab4dbdd"
 
   default_action {
     type             = "forward"

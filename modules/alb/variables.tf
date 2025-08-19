@@ -17,9 +17,9 @@ variable "vpc_id" {
   type        = string
   description = "VPC ID for Target Group"
 }
-variable "acm_certificate_arn" {
-  type = string
-}
-variable "alb_domain" {
-  type = string
-}
+//variable "acm_certificate_arn" {
+//type = string
+//}
+//variable "alb_domain" {
+//type = string
+//}
