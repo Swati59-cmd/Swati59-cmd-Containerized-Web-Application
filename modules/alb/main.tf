@@ -2,8 +2,8 @@ resource "aws_lb" "this" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = var.alb_sg_ids        
-  subnets            = var.public_subnet_ids 
+  security_groups    = var.alb_sg_ids
+  subnets            = var.public_subnet_ids
   idle_timeout       = 60
 
   tags = {
@@ -50,10 +50,6 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-data "aws_acm_certificate" "this" {
-  domain      = var.alb_domain
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
+
 
 
