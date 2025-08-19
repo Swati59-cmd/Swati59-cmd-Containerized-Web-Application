@@ -16,7 +16,7 @@ on:
         required: true
         default: "false"
       auto_apply:
-        description: "Automatically apply after plan?"
+        description: " Apply after plan?"
         required: true
         default: "false"
 

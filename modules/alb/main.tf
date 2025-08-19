@@ -1,13 +1,9 @@
-############################################
-# Application Load Balancer Module
-############################################
-
 resource "aws_lb" "this" {
   name               = "${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = var.alb_sg_ids        # Passed dynamically from root/module
-  subnets            = var.public_subnet_ids # Passed dynamically from VPC module
+  security_groups    = var.alb_sg_ids        
+  subnets            = var.public_subnet_ids 
   idle_timeout       = 60
 
   tags = {
@@ -17,9 +13,7 @@ resource "aws_lb" "this" {
   }
 }
 
-############################################
-# Target Group
-############################################
+
 resource "aws_lb_target_group" "ecs_tg" {
   name        = "${var.environment}-ecs-tg"
   port        = 80
@@ -43,9 +37,6 @@ resource "aws_lb_target_group" "ecs_tg" {
 }
 
 
-############################################
-# Listener (HTTP)
-############################################
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
