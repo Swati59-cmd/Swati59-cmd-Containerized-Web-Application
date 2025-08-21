@@ -35,18 +35,20 @@ module "albdemo" {
 module "ecs" {
   source = "../../modules/ECS"
 
-  environment       = var.environment
-  ecr_repo_name     = var.ecr_repo_name
-  ami_id            = var.ami_id
-  instance_type     = var.instance_type
-  key_name          = var.key_name
-  ecs_sg_ids        = [module.securitydemo1.ecs_sg_ids]
-  public_subnet_ids = module.vpc.public_subnet_ids
-  target_group_arn  = module.albdemo.target_group_arn
-  alb_listener_arn  = module.albdemo.alb_listener_arn
-  aws_region        = var.aws_region
-  aws_account_id    = var.aws_account_id
-  depends_on        = [module.albdemo]
+  environment        = var.environment
+  ecr_repo_name      = var.ecr_repo_name
+  ami_id             = var.ami_id
+  instance_type      = var.instance_type
+  key_name           = var.key_name
+  ecs_sg_ids         = [module.securitydemo1.ecs_sg_ids]
+  public_subnet_ids  = module.vpc.public_subnet_ids
+  private_subnet_ids = module.vpc.private_subnet_ids
+  target_group_arn   = module.albdemo.target_group_arn
+  alb_listener_arn   = module.albdemo.alb_listener_arn
+  aws_region         = var.aws_region
+  aws_account_id     = var.aws_account_id
+  depends_on         = [module.albdemo]
+
 
 
 }
