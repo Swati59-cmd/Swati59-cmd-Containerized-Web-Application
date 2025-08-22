@@ -1,4 +1,4 @@
-# Create VPC
+
 module "vpc" {
   source               = "../../modules/VPC"
   environment          = var.environment
@@ -9,14 +9,14 @@ module "vpc" {
 
 }
 
-# Create Security Groups
+
 module "securitydemo1" {
   source      = "../../modules/sequrity"
   environment = var.environment
   vpc_id      = module.vpc.vpc_id
 }
 
-# Create ALB
+
 module "albdemo" {
   source            = "../../modules/alb"
   environment       = var.environment
