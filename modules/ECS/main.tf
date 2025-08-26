@@ -142,8 +142,6 @@ resource "aws_ecs_service" "service" {
     container_port   = 5000
   }
 
-
-  // depends_on = [aws_lb_listener.listener]
 }
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
