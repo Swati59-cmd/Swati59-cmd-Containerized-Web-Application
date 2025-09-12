@@ -1,6 +1,4 @@
-#######################
-# VPC
-#######################
+
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -11,9 +9,7 @@ resource "aws_vpc" "this" {
   }
 }
 
-#######################
-# Internet Gateway
-#######################
+
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -22,9 +18,6 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-#######################
-# Public Subnets
-#######################
 resource "aws_subnet" "public" {
   for_each = { for idx, cidr in var.public_subnet_cidrs : idx => cidr }
 
@@ -39,9 +32,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-#######################
-# Private Subnets
-#######################
+
 resource "aws_subnet" "private" {
   for_each = { for idx, cidr in var.private_subnet_cidrs : idx => cidr }
 
@@ -55,9 +46,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-#######################
-# Elastic IP for NAT
-#######################
+
 resource "aws_eip" "nat" {
   count      = length(var.private_subnet_cidrs) > 0 ? 1 : 0
   domain     = "vpc"
@@ -68,9 +57,7 @@ resource "aws_eip" "nat" {
   }
 }
 
-#######################
-# NAT Gateway
-#######################
+
 resource "aws_nat_gateway" "this" {
   count         = length(var.private_subnet_cidrs) > 0 ? 1 : 0
   allocation_id = aws_eip.nat[0].id
@@ -82,9 +69,7 @@ resource "aws_nat_gateway" "this" {
   }
 }
 
-#######################
-# Public Route Table
-#######################
+
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -105,9 +90,7 @@ resource "aws_route_table_association" "public_assoc" {
   route_table_id = aws_route_table.public.id
 }
 
-#######################
-# Private Route Table
-#######################
+
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
 
@@ -129,7 +112,5 @@ resource "aws_route_table_association" "private_assoc" {
   route_table_id = aws_route_table.private.id
 }
 
-#######################
-# Outputs
-#######################
+
 
