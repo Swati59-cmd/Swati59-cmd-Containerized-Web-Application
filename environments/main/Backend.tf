@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "swatitfstate"
+    bucket = "statefiledemo2"
     key    = "MainEnv/terraform.tfstate"
     region = "us-east-1"
 
