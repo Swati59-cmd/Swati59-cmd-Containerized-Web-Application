@@ -18,7 +18,7 @@ on:
       auto_apply:
         description: "Apply after plan?"
         required: true
-        default: "false"
+        default: "true"
  
 env:
   AWS_REGION: us-east-1
