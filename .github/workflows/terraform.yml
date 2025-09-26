@@ -49,7 +49,7 @@ jobs:
               echo "tf_env_dir=environments/stage" >> $GITHUB_OUTPUT
             else
               echo "env_name=prod" >> $GITHUB_OUTPUT
-              echo "tf_env_dir=environments/prod" >> $GITHUB_OUTPUT
+              echo "tf_env_dir=environments/main" >> $GITHUB_OUTPUT
             fi
           fi
 
