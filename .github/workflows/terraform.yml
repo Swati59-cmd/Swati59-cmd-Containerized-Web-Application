@@ -1,13 +1,12 @@
 name: Terraform Deployment
-
+ 
 on:
-  push:
-    branches:
-      - dev
-      - stage
-      - main
   workflow_dispatch:
     inputs:
+      environment:
+        description: "Environment to deploy (dev, stage, prod)"
+        required: true
+       
       destroy:
         description: "Set to true to destroy instead of apply"
         required: true
@@ -16,97 +15,102 @@ on:
         description: "Apply after plan?"
         required: true
         default: "true"
-
+ 
 env:
   AWS_REGION: us-east-1
-
+  ENV_NAME: ${{ github.event.inputs.environment }}
+  TF_ENV_DIR: environments/${{ github.event.inputs.environment }}
+ 
 jobs:
-  set-env:
-    runs-on: ubuntu-latest
-    outputs:
-      ENV_NAME: ${{ steps.detect.outputs.env_name }}
-      TF_ENV_DIR: ${{ steps.detect.outputs.tf_env_dir }}
-    steps:
-      - id: detect
-        run: |
-          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
-            echo "env_name=dev" >> $GITHUB_OUTPUT
-            echo "tf_env_dir=environments/dev" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "stage" ]]; then
-            echo "env_name=stage" >> $GITHUB_OUTPUT
-            echo "tf_env_dir=environments/stage" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "env_name=prod" >> $GITHUB_OUTPUT
-            echo "tf_env_dir=environments/prod" >> $GITHUB_OUTPUT
-          else
-            echo "Unsupported branch: ${GITHUB_REF_NAME}"
-            exit 1
-          fi
-
   plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
-    needs: set-env
-    if: github.event.inputs.destroy != 'true'
+    if: ${{ github.event.inputs.destroy != 'true' }}
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - uses: hashicorp/setup-terraform@v2
+ 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} plan -out=tfplan
-
-      - uses: actions/upload-artifact@v4
+ 
+      - name: Terraform Init
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} init
+ 
+      - name: Terraform Plan
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} plan -out=tfplan
+ 
+      - name: Upload tfplan Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ needs.set-env.outputs.TF_ENV_DIR }}/tfplan
-
+          path: ${{ env.TF_ENV_DIR }}/tfplan
+ 
   apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
-    needs: [set-env, plan]
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy != 'true' && github.event.inputs.auto_apply == 'true'
+    needs: plan
+    if: ${{ github.event.inputs.destroy != 'true' && github.event.inputs.auto_apply == 'true' }}
     environment:
-      name: ${{ needs.set-env.outputs.ENV_NAME }}
+      name: ${{ github.event.inputs.environment }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      - uses: hashicorp/setup-terraform@v2
+ 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-      - uses: actions/download-artifact@v4
+ 
+      - name: Download tfplan Artifact
+        uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ needs.set-env.outputs.TF_ENV_DIR }}
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} apply tfplan
-
+          path: ${{ env.TF_ENV_DIR }}
+ 
+      - name: Terraform Init
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} init
+ 
+      - name: Terraform Apply
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} apply tfplan
+ 
   destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
-    needs: set-env
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
+    if: ${{ github.event.inputs.destroy == 'true' }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      - uses: hashicorp/setup-terraform@v2
+ 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} destroy -auto-approve
+ 
+      - name: Terraform Init
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} init
+ 
+      - name: Terraform Destroy
+        run: terraform -chdir=${{ env.TF_ENV_DIR }} destroy -auto-approve

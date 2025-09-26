@@ -6,7 +6,4 @@ terraform {
 
   }
 }
-#helloooswati
-#gsrdtfhygjklkjmnb
-#dfgyhujik,mnb
-#dtfyugkhlj;.,mnbgfd
+
