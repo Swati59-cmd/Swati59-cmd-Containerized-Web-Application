@@ -20,7 +20,7 @@ on:
     paths:
       - "environments/dev/**"
       - "environments/stage/**"
-      - "environments/main/**"
+      - "environments/prod/**"
 
 env:
   AWS_REGION: us-east-1
@@ -48,8 +48,8 @@ jobs:
               echo "env_name=stage" >> $GITHUB_OUTPUT
               echo "tf_env_dir=environments/stage" >> $GITHUB_OUTPUT
             else
-              echo "env_name=main" >> $GITHUB_OUTPUT
-              echo "tf_env_dir=environments/main" >> $GITHUB_OUTPUT
+              echo "env_name=prod" >> $GITHUB_OUTPUT
+              echo "tf_env_dir=environments/prod" >> $GITHUB_OUTPUT
             fi
           fi
 
