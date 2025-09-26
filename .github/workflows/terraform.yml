@@ -1,12 +1,13 @@
 name: Terraform Deployment
 
 on:
+  push:
+    branches:
+      - dev
+      - stage
+      - main
   workflow_dispatch:
     inputs:
-      environment:
-        description: "Environment to deploy (dev, stage, prod)"
-        required: true
-        
       destroy:
         description: "Set to true to destroy instead of apply"
         required: true
@@ -16,50 +17,37 @@ on:
         required: true
         default: "true"
 
-  push:
-    paths:
-      - "environments/dev/**"
-      - "environments/stage/**"
-      - "environments/prod/**"
-
 env:
   AWS_REGION: us-east-1
-  # If manual dispatch → use input, if push → detect env from path
-  ENV_NAME: ${{ github.event.inputs.environment || github.ref_name }}
-  TF_ENV_DIR: environments/${{ github.event.inputs.environment }}
 
 jobs:
-  detect-env:
+  set-env:
     runs-on: ubuntu-latest
     outputs:
-      env_name: ${{ steps.setenv.outputs.env_name }}
-      tf_env_dir: ${{ steps.setenv.outputs.tf_env_dir }}
+      ENV_NAME: ${{ steps.detect.outputs.env_name }}
+      TF_ENV_DIR: ${{ steps.detect.outputs.tf_env_dir }}
     steps:
-      - id: setenv
+      - id: detect
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "env_name=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
-            echo "tf_env_dir=environments/${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            echo "env_name=dev" >> $GITHUB_OUTPUT
+            echo "tf_env_dir=environments/dev" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF_NAME}" == "stage" ]]; then
+            echo "env_name=stage" >> $GITHUB_OUTPUT
+            echo "tf_env_dir=environments/stage" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "env_name=prod" >> $GITHUB_OUTPUT
+            echo "tf_env_dir=environments/prod" >> $GITHUB_OUTPUT
           else
-            if [[ "${{ github.event.head_commit.message }}" == *"dev"* || "${{ github.ref }}" == *"dev"* ]]; then
-              echo "env_name=dev" >> $GITHUB_OUTPUT
-              echo "tf_env_dir=environments/dev" >> $GITHUB_OUTPUT
-            elif [[ "${{ github.ref }}" == *"stage"* ]]; then
-              echo "env_name=stage" >> $GITHUB_OUTPUT
-              echo "tf_env_dir=environments/stage" >> $GITHUB_OUTPUT
-            else
-              echo "env_name=prod" >> $GITHUB_OUTPUT
-              echo "tf_env_dir=environments/prod" >> $GITHUB_OUTPUT
-            fi
+            echo "Unsupported branch: ${GITHUB_REF_NAME}"
+            exit 1
           fi
 
   plan:
-    needs: detect-env
+    name: Terraform Plan
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.destroy != 'true' }}
-    env:
-      ENV_NAME: ${{ needs.detect-env.outputs.env_name }}
-      TF_ENV_DIR: ${{ needs.detect-env.outputs.tf_env_dir }}
+    needs: set-env
+    if: github.event.inputs.destroy != 'true'
     steps:
       - uses: actions/checkout@v3
 
@@ -73,61 +61,52 @@ jobs:
         with:
           terraform_version: 1.5.7
 
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} plan -out=tfplan
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} plan -out=tfplan
 
       - uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.TF_ENV_DIR }}/tfplan
+          path: ${{ needs.set-env.outputs.TF_ENV_DIR }}/tfplan
 
   apply:
-    needs: [detect-env, plan]
+    name: Terraform Apply
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.destroy != 'true' && github.event.inputs.auto_apply == 'true' }}
-    env:
-      ENV_NAME: ${{ needs.detect-env.outputs.env_name }}
-      TF_ENV_DIR: ${{ needs.detect-env.outputs.tf_env_dir }}
+    needs: [set-env, plan]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy != 'true' && github.event.inputs.auto_apply == 'true'
+    environment:
+      name: ${{ needs.set-env.outputs.ENV_NAME }}
     steps:
       - uses: actions/checkout@v3
-
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-
       - uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.TF_ENV_DIR }}
-
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} apply tfplan
+          path: ${{ needs.set-env.outputs.TF_ENV_DIR }}
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} apply tfplan
 
   destroy:
-    needs: detect-env
+    name: Terraform Destroy
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.destroy == 'true' }}
-    env:
-      ENV_NAME: ${{ needs.detect-env.outputs.env_name }}
-      TF_ENV_DIR: ${{ needs.detect-env.outputs.tf_env_dir }}
+    needs: set-env
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
     steps:
       - uses: actions/checkout@v3
-
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} init
-      - run: terraform -chdir=${{ env.TF_ENV_DIR }} destroy -auto-approve
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} init
+      - run: terraform -chdir=${{ needs.set-env.outputs.TF_ENV_DIR }} destroy -auto-approve
