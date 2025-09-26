@@ -6,7 +6,7 @@ on:
       environment:
         description: "Environment to deploy (dev, stage, prod)"
         required: true
-        default: "dev"
+        
       destroy:
         description: "Set to true to destroy instead of apply"
         required: true
@@ -20,7 +20,7 @@ on:
     paths:
       - "environments/dev/**"
       - "environments/stage/**"
-      - "environments/prod/**"
+      - "environments/main/**"
 
 env:
   AWS_REGION: us-east-1
